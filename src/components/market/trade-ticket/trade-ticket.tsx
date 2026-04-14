@@ -127,9 +127,9 @@ export function TradeTicket({
     [market.contracts, selectedContract.id]
   )
 
-  const basePrice = selectedContract.yesPrice
-  const marketPrice =
-    outcomeLeg === "no" ? 1 - basePrice : basePrice
+  const basePrice =
+    Number.isFinite(selectedContract?.yesPrice) ? selectedContract.yesPrice : 0
+  const marketPrice = outcomeLeg === "no" ? 1 - basePrice : basePrice
   const outcomeLabel = quoteOutcomeLabel(
     market,
     selectedContractIndex,
@@ -143,25 +143,29 @@ export function TradeTicket({
   const px = previewExecPrice(marketPrice, flow, orderType, limitPrice)
   const sharesNum = parsePositiveNumber(shares)
   const execPrice = px.ok ? px.price : 0
-  const estCost = sharesNum > 0 && px.ok ? sharesNum * execPrice : 0
-  const maxPayout = sharesNum
+  const estCost =
+    sharesNum > 0 && px.ok && Number.isFinite(execPrice) ? sharesNum * execPrice : 0
+  const maxPayout = sharesNum > 0 ? sharesNum : 0
+
+  const openPos = getOpenPosition(market.slug, selectedContractIndex, outcomeLeg)
+  const openPosShares = openPos?.shares ?? 0
+  const openPosCostBasis = openPos?.costBasisUsd ?? 0
+  const canSell = Boolean(openPos && openPosShares > 0 && !openPos?.closedAt)
+
   const sellCostPortion =
-    flow === "sell" && openPos && openPos.shares > 0
-      ? (sharesNum / openPos.shares) * openPos.costBasisUsd
+    flow === "sell" && openPosShares > 0 && Number.isFinite(openPosCostBasis)
+      ? (sharesNum / openPosShares) * openPosCostBasis
       : 0
   const youPay = flow === "buy" ? estCost : 0
   const youWin = flow === "buy" ? maxPayout : estCost
   const estProfit = flow === "buy" ? maxPayout - estCost : estCost - sellCostPortion
-
-  const openPos = getOpenPosition(market.slug, selectedContractIndex, outcomeLeg)
-  const canSell = Boolean(openPos && openPos.shares > 0 && !openPos.closedAt)
 
   const disabled =
     market.status !== "open" ||
     ui.kind === "loading" ||
     sharesNum <= 0 ||
     !px.ok ||
-    (flow === "sell" && (!canSell || sharesNum > (openPos?.shares ?? 0)))
+    (flow === "sell" && (!canSell || sharesNum > openPosShares))
 
   const directionWord = outcomeLeg === "yes" ? "YES" : "NO"
   const headingFull = `${flow === "buy" ? "Buying" : "Selling"} ${directionWord} — ${selectedContract.name}`
@@ -195,7 +199,7 @@ export function TradeTicket({
       return
     }
     if (flow === "sell") {
-      if (!openPos || sharesNum > openPos.shares) {
+      if (!openPos || sharesNum > openPosShares) {
         onUiChange({ kind: "error", message: "Not enough shares to sell." })
         return
       }
