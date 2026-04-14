@@ -1,0 +1,350 @@
+import type { MarketStatus, MarketType } from "@/lib/market-view-model"
+
+export type RawSnapshotOutcome = {
+  label: string
+  price: number
+}
+
+export type RawSnapshotMarket = {
+  id: string
+  slug: string
+  question: string
+  category: string
+  marketType: MarketType
+  image?: string
+  outcomes: RawSnapshotOutcome[]
+  /** legacy snapshot fields kept for compatibility with archived data captures */
+  yesPrice?: number
+  noPrice?: number
+  volumeUsd: number
+  expiresAt: string
+  status: MarketStatus
+  description?: string
+  source: "gamma-market" | "gamma-event"
+}
+
+/**
+ * Frozen demo dataset — normalized `MarketViewModel` only.
+ * Captured for stable offline demos; not regenerated at runtime.
+ *
+ * `image` URLs mirror Polymarket Gamma: prefer `event.image` / `market.image`, then `icon`
+ * when hand-curating (see `pickGammaImage` in `polymarket-live.ts`).
+ */
+const IMG = {
+  dem2028:
+    "https://polymarket-upload.s3.us-east-2.amazonaws.com/democrats+2028+donkey.png",
+  gop2028:
+    "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+  wc2026:
+    "https://polymarket-upload.s3.us-east-2.amazonaws.com/2026-fifa-world-cup-winner-595-8rgoVIZnbKgL.png",
+  fedCuts:
+    "https://polymarket-upload.s3.us-east-2.amazonaws.com/how-many-fed-rate-cuts-in-2025-9qstZkSL1dn0.jpg",
+  btc:
+    "https://polymarket-upload.s3.us-east-2.amazonaws.com/BTC+fullsize.png",
+  ethReserve:
+    "https://polymarket-upload.s3.us-east-2.amazonaws.com/us-national-ethereum-reserve-in-2025-bMK7qpXLSRq5.jpg",
+  euMacron:
+    "https://polymarket-upload.s3.us-east-2.amazonaws.com/macron-out-in-2025-qFUc7czZE3Ev.jpg",
+  starship:
+    "https://polymarket-upload.s3.us-east-2.amazonaws.com/spacex-starship-flight-test-10-KJ2wEPdcMh5k.jpg",
+  ukraineCeasefire:
+    "https://polymarket-upload.s3.us-east-2.amazonaws.com/russia-x-ukraine-ceasefire-in-2025-w2voYOygx80B.jpg",
+  taiwan:
+    "https://polymarket-upload.s3.us-east-2.amazonaws.com/china-invades-taiwan-in-2025-CCSd9dX2mrea.jpg",
+  nfl:
+    "https://polymarket-upload.s3.us-east-2.amazonaws.com/tush-push-banned-for-2026-nfl-season-ua53ijV-WRil.jpg",
+  epl:
+    "https://polymarket-upload.s3.us-east-2.amazonaws.com/english-premier-league-winner-VFcNkpZeA9Sz.jpg",
+  entertainment:
+    "https://polymarket-upload.s3.us-east-2.amazonaws.com/taylor-swift-pregnant-in-2025-5cpC3Ir4u5Pd.jpg",
+  largestCo:
+    "https://polymarket-upload.s3.us-east-2.amazonaws.com/largest-company-eoy-KS99l6lbxfCc.jpg",
+} as const
+
+export const MARKETS_SNAPSHOT_RAW: readonly RawSnapshotMarket[] = [
+  {
+    id: "ev-2028-dem",
+    slug: "democratic-presidential-nominee-2028",
+    question: "Democratic Presidential Nominee 2028",
+    category: "Politics",
+    marketType: "multi",
+    image: IMG.dem2028,
+    outcomes: [
+      { label: "Gavin Newsom", price: 0.31 },
+      { label: "Alexandria Ocasio-Cortez", price: 0.12 },
+      { label: "Pete Buttigieg", price: 0.09 },
+      { label: "Wes Moore", price: 0.08 },
+      { label: "Other", price: 0.4 },
+    ],
+    yesPrice: 0.31,
+    noPrice: 0.12,
+    volumeUsd: 1_031_000_000,
+    expiresAt: "2028-11-05T12:00:00.000Z",
+    status: "open",
+    description:
+      "Resolves to the nominee of the Democratic Party for the 2028 presidential election.",
+    source: "gamma-event",
+  },
+  {
+    id: "ev-2028-gop",
+    slug: "republican-presidential-nominee-2028",
+    question: "Republican Presidential Nominee 2028",
+    category: "Politics",
+    marketType: "multi",
+    image: IMG.gop2028,
+    outcomes: [
+      { label: "JD Vance", price: 0.22 },
+      { label: "Marco Rubio", price: 0.11 },
+      { label: "Ron DeSantis", price: 0.14 },
+      { label: "Tucker Carlson", price: 0.07 },
+      { label: "Field", price: 0.46 },
+    ],
+    yesPrice: 0.22,
+    noPrice: 0.11,
+    volumeUsd: 546_000_000,
+    expiresAt: "2028-11-05T12:00:00.000Z",
+    status: "open",
+    source: "gamma-event",
+  },
+  {
+    id: "ev-wc26",
+    slug: "2026-fifa-world-cup-winner",
+    question: "2026 FIFA World Cup Winner",
+    category: "Sports",
+    marketType: "multi",
+    image: IMG.wc2026,
+    outcomes: [
+      { label: "Brazil", price: 0.18 },
+      { label: "France", price: 0.15 },
+      { label: "England", price: 0.11 },
+      { label: "Argentina", price: 0.13 },
+      { label: "Spain", price: 0.09 },
+      { label: "Other", price: 0.34 },
+    ],
+    yesPrice: 0.18,
+    noPrice: 0.15,
+    volumeUsd: 603_000_000,
+    expiresAt: "2026-07-19T12:00:00.000Z",
+    status: "open",
+    source: "gamma-event",
+  },
+  {
+    id: "m-fed-cut",
+    slug: "fed-rate-cut-by-july-2026",
+    question: "Fed rate cut by July 2026?",
+    category: "Business",
+    marketType: "binary",
+    image: IMG.fedCuts,
+    outcomes: [
+      { label: "Yes", price: 0.58 },
+      { label: "No", price: 0.42 },
+    ],
+    yesPrice: 0.58,
+    noPrice: 0.42,
+    volumeUsd: 2_400_000,
+    expiresAt: "2026-07-31T23:59:59.000Z",
+    status: "open",
+    source: "gamma-market",
+  },
+  {
+    id: "m-btc-100k",
+    slug: "btc-100k-2026",
+    question: "Will BTC close above $100k before 2027?",
+    category: "Crypto",
+    marketType: "binary",
+    image: IMG.btc,
+    outcomes: [
+      { label: "Yes", price: 0.52 },
+      { label: "No", price: 0.48 },
+    ],
+    yesPrice: 0.52,
+    noPrice: 0.48,
+    volumeUsd: 8_200_000,
+    expiresAt: "2026-12-31T23:59:59.000Z",
+    status: "open",
+    source: "gamma-market",
+  },
+  {
+    id: "m-eth-l1",
+    slug: "eth-flip-btc-narrative-2026",
+    question: "Major ETH L2 TVL exceeds $100B by end of 2026?",
+    category: "Crypto",
+    marketType: "binary",
+    image: IMG.ethReserve,
+    outcomes: [
+      { label: "Yes", price: 0.27 },
+      { label: "No", price: 0.73 },
+    ],
+    yesPrice: 0.27,
+    noPrice: 0.73,
+    volumeUsd: 1_100_000,
+    expiresAt: "2026-12-31T23:59:59.000Z",
+    status: "open",
+    source: "gamma-market",
+  },
+  {
+    id: "m-ai-act",
+    slug: "eu-ai-act-milestone-2025",
+    question: "EU AI Act compliance milestone hit before Q3 2026?",
+    category: "Tech",
+    marketType: "binary",
+    image: IMG.euMacron,
+    outcomes: [
+      { label: "Yes", price: 0.44 },
+      { label: "No", price: 0.56 },
+    ],
+    yesPrice: 0.44,
+    noPrice: 0.56,
+    volumeUsd: 890_000,
+    expiresAt: "2026-09-30T23:59:59.000Z",
+    status: "open",
+    source: "gamma-market",
+  },
+  {
+    id: "m-spacex",
+    slug: "spacex-orbital-launch-count-2026",
+    question: "SpaceX completes 150+ orbital launches in 2026?",
+    category: "Tech",
+    marketType: "binary",
+    image: IMG.starship,
+    outcomes: [
+      { label: "Yes", price: 0.36 },
+      { label: "No", price: 0.64 },
+    ],
+    yesPrice: 0.36,
+    noPrice: 0.64,
+    volumeUsd: 3_400_000,
+    expiresAt: "2026-12-31T23:59:59.000Z",
+    status: "open",
+    source: "gamma-market",
+  },
+  {
+    id: "m-ukraine",
+    slug: "ukraine-ceasefire-2026",
+    question: "Official Ukraine–Russia ceasefire announced before 2027?",
+    category: "World",
+    marketType: "binary",
+    image: IMG.ukraineCeasefire,
+    outcomes: [
+      { label: "Yes", price: 0.21 },
+      { label: "No", price: 0.79 },
+    ],
+    yesPrice: 0.21,
+    noPrice: 0.79,
+    volumeUsd: 12_500_000,
+    expiresAt: "2026-12-31T23:59:59.000Z",
+    status: "open",
+    source: "gamma-market",
+  },
+  {
+    id: "m-china-tw",
+    slug: "china-taiwan-incident-2026",
+    question: "Major cross-strait military incident before 2027?",
+    category: "World",
+    marketType: "binary",
+    image: IMG.taiwan,
+    outcomes: [
+      { label: "Yes", price: 0.14 },
+      { label: "No", price: 0.86 },
+    ],
+    yesPrice: 0.14,
+    noPrice: 0.86,
+    volumeUsd: 5_600_000,
+    expiresAt: "2026-12-31T23:59:59.000Z",
+    status: "open",
+    source: "gamma-market",
+  },
+  {
+    id: "m-nfl",
+    slug: "super-bowl-lx-winner-afc-nfc",
+    question: "NFC team wins Super Bowl LX?",
+    category: "Sports",
+    marketType: "binary",
+    image: IMG.nfl,
+    outcomes: [
+      { label: "Yes", price: 0.48 },
+      { label: "No", price: 0.52 },
+    ],
+    yesPrice: 0.48,
+    noPrice: 0.52,
+    volumeUsd: 22_000_000,
+    expiresAt: "2026-02-08T23:59:59.000Z",
+    status: "open",
+    source: "gamma-market",
+  },
+  {
+    id: "m-prem",
+    slug: "premier-league-top4-newcomer-2026",
+    question: "A club outside traditional top six finishes top four in 2025–26?",
+    category: "Sports",
+    marketType: "binary",
+    image: IMG.epl,
+    outcomes: [
+      { label: "Yes", price: 0.19 },
+      { label: "No", price: 0.81 },
+    ],
+    yesPrice: 0.19,
+    noPrice: 0.81,
+    volumeUsd: 4_200_000,
+    expiresAt: "2026-05-15T23:59:59.000Z",
+    status: "open",
+    source: "gamma-market",
+  },
+  {
+    id: "m-oscar",
+    slug: "best-picture-non-english-2026",
+    question: "Non-English language film wins Best Picture at 2026 Oscars?",
+    category: "General",
+    marketType: "binary",
+    image: IMG.entertainment,
+    outcomes: [
+      { label: "Yes", price: 0.33 },
+      { label: "No", price: 0.67 },
+    ],
+    yesPrice: 0.33,
+    noPrice: 0.67,
+    volumeUsd: 640_000,
+    expiresAt: "2026-03-15T23:59:59.000Z",
+    status: "open",
+    source: "gamma-market",
+  },
+  {
+    id: "m-closed-demo",
+    slug: "demo-closed-market-sample",
+    question: "Demo closed market (resolved Yes)",
+    category: "General",
+    marketType: "binary",
+    /* Omit `image` intentionally — exercises initials fallback on home cards. */
+    outcomes: [
+      { label: "Yes", price: 1 },
+      { label: "No", price: 0 },
+    ],
+    yesPrice: 1,
+    noPrice: 0,
+    volumeUsd: 120_000,
+    expiresAt: "2025-06-01T23:59:59.000Z",
+    status: "closed",
+    source: "gamma-market",
+  },
+  {
+    id: "ev-tech5",
+    slug: "largest-company-by-mcap-2026",
+    question: "Largest company by market cap at end of 2026?",
+    category: "Business",
+    marketType: "multi",
+    image: IMG.largestCo,
+    outcomes: [
+      { label: "Apple", price: 0.28 },
+      { label: "Microsoft", price: 0.24 },
+      { label: "NVIDIA", price: 0.31 },
+      { label: "Google", price: 0.09 },
+      { label: "Other", price: 0.08 },
+    ],
+    yesPrice: 0.28,
+    noPrice: 0.24,
+    volumeUsd: 18_000_000,
+    expiresAt: "2026-12-31T23:59:59.000Z",
+    status: "open",
+    source: "gamma-event",
+  },
+] satisfies readonly RawSnapshotMarket[]
