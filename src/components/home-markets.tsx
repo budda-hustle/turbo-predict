@@ -306,7 +306,7 @@ export function HomeMarkets({
       {/* Sticky discovery: search + controls (row 1), expandable filters + categories below */}
       <div
         className={cn(
-          "sticky top-14 z-30 -mx-4 border-b border-border/50 bg-background/90 px-4 py-3 shadow-[0_6px_20px_-12px_rgba(0,0,0,0.45)] backdrop-blur-md sm:-mx-6 sm:px-6"
+          "sticky top-16 z-30 -mx-4 border-b border-border/50 bg-background/90 px-4 pb-3 pt-4 shadow-[0_6px_20px_-12px_rgba(0,0,0,0.45)] backdrop-blur-md sm:-mx-6 sm:px-6"
         )}
       >
         {/* Row 1: search + filter toggle + Portfolio */}
