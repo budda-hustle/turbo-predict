@@ -23,7 +23,7 @@ export function MarketContextRulesTabs({ market }: { market: MarketViewModel }) 
           type="button"
           onClick={() => setActiveTab("rules")}
           className={cn(
-            "cursor-pointer text-xs font-medium tracking-wide uppercase transition-colors",
+            "label-md cursor-pointer transition-colors",
             activeTab === "rules" ? "text-foreground" : "text-muted-foreground"
           )}
         >
@@ -33,14 +33,14 @@ export function MarketContextRulesTabs({ market }: { market: MarketViewModel }) 
           type="button"
           onClick={() => setActiveTab("context")}
           className={cn(
-            "cursor-pointer text-xs font-medium tracking-wide uppercase transition-colors",
+            "label-md cursor-pointer transition-colors",
             activeTab === "context" ? "text-foreground" : "text-muted-foreground"
           )}
         >
           CONTEXT
         </button>
       </div>
-      <div className="rounded-xl border border-border/25 bg-white/5 px-5 py-4 text-sm leading-relaxed text-muted-foreground">
+      <div className="surface-card body-md border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.02)_0%,rgba(0,0,0,0.22)_100%)] px-5 py-4 text-sm text-muted-foreground">
         {activeTab === "rules" ? rulesBody : contextBody}
       </div>
     </section>

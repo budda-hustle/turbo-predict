@@ -156,24 +156,23 @@ export function MarketActivityBlock({ market }: { market: MarketViewModel }) {
   return (
     <section className="space-y-2">
       <div className="flex items-baseline justify-between gap-2">
-        <h2 className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+        <h2 className="label-md text-muted-foreground">
           Activity
         </h2>
-        <span className="text-[10px] text-muted-foreground">Demo</span>
       </div>
-      <div className="surface-card border-border/60 px-3 py-3">
-        <ul className="flex max-h-52 flex-col gap-1.5 overflow-y-auto font-mono text-[11px] leading-snug">
+      <div className="surface-card border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.02)_0%,rgba(0,0,0,0.22)_100%)] px-3 py-3">
+        <ul className="flex max-h-52 flex-col gap-1.5 overflow-y-auto font-mono text-[11px] leading-[1.4]">
           {rows.map((row) => (
             <li
               key={row.key}
               className={cn(
-                "tabular-nums text-foreground/88",
+                "tabular-nums rounded-md px-1 py-0.5 text-activity-foreground transition-colors hover:bg-white/[0.03]",
                 row.isLarge &&
                   "text-[12px] font-semibold tracking-tight opacity-100",
                 !row.isLarge && "font-normal opacity-95"
               )}
             >
-              <span className="text-foreground/90">{row.verb}</span>{" "}
+              <span className="label-md text-content-secondary">{row.verb}</span>{" "}
               <span
                 className={cn(
                   "font-medium",
@@ -182,17 +181,17 @@ export function MarketActivityBlock({ market }: { market: MarketViewModel }) {
               >
                 {row.contractSide.toUpperCase()}
               </span>{" "}
-              <span className="text-foreground/85">{row.sizeStr}</span>{" "}
-              <span className="text-muted-foreground/80">@</span>{" "}
-              <span className="text-foreground/85">{row.cents}¢</span>{" "}
-              <span className="text-muted-foreground/65">·</span>{" "}
-              <span className="text-muted-foreground/85">{row.rel}</span>{" "}
-              <span className="text-muted-foreground/65">·</span>{" "}
-              <span className="text-muted-foreground/85">{row.user}</span>
+              <span className="text-activity-foreground">{row.sizeStr}</span>{" "}
+              <span className="text-activity-muted">@</span>{" "}
+              <span className="text-activity-foreground">{row.cents}¢</span>{" "}
+              <span className="text-activity-muted">·</span>{" "}
+              <span className="text-activity-muted">{row.rel}</span>{" "}
+              <span className="text-activity-muted">·</span>{" "}
+              <span className="text-activity-muted">{row.user}</span>
             </li>
           ))}
         </ul>
-        <p className="mt-3 border-t border-border/40 pt-2 text-center text-[10px] text-muted-foreground">
+        <p className="field-helper mt-3 border-t border-activity-border pt-2 text-center text-[10px] text-activity-muted">
           Session tape · Vol. {formatUsdCompact(market.volumeUsd)}
         </p>
       </div>

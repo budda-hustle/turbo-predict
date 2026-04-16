@@ -39,7 +39,7 @@ function MarketThumbnail({
       <div
         className={cn(
           THUMB_SIZE,
-          "shrink-0 rounded-md border border-border/70 bg-muted/40",
+          "shrink-0 rounded-md bg-muted/40",
           "flex items-center justify-center font-mono text-xs font-medium text-muted-foreground"
         )}
         aria-hidden
@@ -54,7 +54,7 @@ function MarketThumbnail({
     <img
       src={url}
       alt=""
-      className={cn(THUMB_SIZE, "shrink-0 rounded-md border border-border/60 object-cover")}
+      className={cn(THUMB_SIZE, "shrink-0 rounded-md object-cover")}
       loading="lazy"
       referrerPolicy="no-referrer"
       onError={() => setFailed(true)}
@@ -93,13 +93,13 @@ export function MarketHero({ market }: { market: MarketViewModel }) {
       <div className="mb-6">
         <Link
           href="/"
-          className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+          className="button-md text-xs text-muted-foreground transition-colors hover:text-foreground"
         >
           ← Markets
         </Link>
       </div>
       <div className="space-y-3">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 rounded-xl transition-all duration-200 ease-out">
           <MarketThumbnail imageUrl={market.image} title={market.question} />
           <div className="min-w-0 space-y-3">
             <div className="flex flex-wrap items-center gap-2">
@@ -108,20 +108,20 @@ export function MarketHero({ market }: { market: MarketViewModel }) {
                 {market.marketType === "binary" ? "Binary" : "Multi-outcome"}
               </Badge>
               {market.status === "open" ? (
-                <span className="text-xs font-medium text-yes">Open</span>
+                <span className="label-md text-yes">Active</span>
               ) : (
-                <span className="text-xs text-muted-foreground">Closed</span>
+                <span className="label-md text-muted-foreground">Closed</span>
               )}
             </div>
-            <h1 className="text-xl font-semibold leading-snug tracking-tight text-foreground sm:text-2xl">
+            <h1 className="title-xl text-xl font-semibold tracking-[0.04em] text-white uppercase sm:text-2xl">
               {market.question}
             </h1>
             <div
               className={cn(
-                "flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground"
+                "body-sm flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-muted-foreground/90"
               )}
             >
-              <span className="inline-flex items-center gap-1.5 font-mono tabular-nums">
+              <span className="inline-flex items-center gap-1.5 tabular-nums">
                 Expires {formatExpiry(market.expiresAt)}
               </span>
               <span className="hidden sm:inline" aria-hidden>
@@ -129,7 +129,7 @@ export function MarketHero({ market }: { market: MarketViewModel }) {
               </span>
               <span
                 className={cn(
-                  "inline-flex items-center gap-1.5 font-mono tabular-nums",
+                  "inline-flex items-center gap-1.5 tabular-nums",
                   cd.urgent &&
                     market.status === "open" &&
                     "text-amber-600 dark:text-amber-400"
@@ -141,7 +141,7 @@ export function MarketHero({ market }: { market: MarketViewModel }) {
               <span className="hidden sm:inline" aria-hidden>
                 ·
               </span>
-              <span className="inline-flex items-center gap-1.5 font-mono tabular-nums">
+              <span className="inline-flex items-center gap-1.5 tabular-nums">
                 Vol. {formatUsdCompact(market.volumeUsd)}
               </span>
             </div>

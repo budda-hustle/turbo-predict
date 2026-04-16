@@ -281,6 +281,7 @@ export function DepositDialog() {
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <Button
                   type="button"
+                  variant="primary"
                   className="pressable cursor-pointer"
                   onClick={() => void copyAddress()}
                 >

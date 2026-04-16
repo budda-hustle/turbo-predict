@@ -1,14 +1,21 @@
 import type { Metadata } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
+import { Exo, Geist_Mono, Inter } from "next/font/google"
 
-import { AppHeader } from "@/components/app-header"
+import { AppShell } from "@/components/app-shell"
 import { Providers } from "@/components/providers"
 
 import "./globals.css"
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const exo = Exo({
+  variable: "--font-exo",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+})
+
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
 })
 
 const geistMono = Geist_Mono({
@@ -17,8 +24,11 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "PulseMarkets — Prediction markets",
-  description: "Demo prediction markets — discover, trade, and track positions.",
+  title: {
+    default: "Turbo Predict",
+    template: "%s | Turbo Predict",
+  },
+  description: "Prediction market",
 }
 
 export default function RootLayout({
@@ -29,15 +39,14 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full`}
+      className={`${exo.variable} ${inter.variable} ${geistMono.variable} h-full`}
       suppressHydrationWarning
     >
       <body
-        className={`${geistSans.className} flex min-h-full flex-col antialiased`}
+        className={`${inter.className} flex min-h-full flex-col bg-background text-foreground antialiased`}
       >
         <Providers>
-          <AppHeader />
-          <main className="flex-1">{children}</main>
+          <AppShell>{children}</AppShell>
         </Providers>
       </body>
     </html>

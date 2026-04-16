@@ -72,16 +72,17 @@ function quoteOutcomeLabel(
 }
 
 const flowBar =
-  "flex flex-1 gap-0.5 rounded-lg border border-border/40 bg-muted/15 p-0.5"
+  "flex flex-1 gap-0.5 rounded-lg border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.02)_0%,rgba(0,0,0,0.2)_100%)] p-0.5"
 const controlHeight = "h-7"
 const dropdownControlHeight = "h-8"
 const controlRadius = "rounded-lg"
 const controlInnerRadius = "rounded-md"
 const flowBtn =
-  `${controlHeight} flex-1 ${controlInnerRadius} px-2 text-[10px] font-medium transition-colors`
-const flowInactive = "text-muted-foreground/90 hover:text-foreground/70"
+  `button-md ${controlHeight} flex-1 ${controlInnerRadius} px-2 text-[10px] transition-colors`
+const flowInactive =
+  "border border-transparent bg-transparent text-muted-foreground/90 hover:bg-white/[0.02] hover:text-foreground/70"
 const flowActive =
-  "bg-background/90 text-foreground shadow-sm ring-1 ring-border/30"
+  "border border-[hsl(var(--primary)/0.22)] bg-[linear-gradient(180deg,rgba(255,215,0,0.08)_0%,rgba(255,215,0,0.04)_100%)] text-foreground"
 
 export function TradeTicket({
   market,
@@ -272,22 +273,22 @@ export function TradeTicket({
   return (
     <div
       className={cn(
-        "surface-card flex flex-col gap-5 border-border/45 bg-card/95 p-5 shadow-[0_22px_55px_-28px_rgba(0,0,0,0.55)] sm:p-6"
+        "surface-card flex flex-col gap-5 border border-white/8 bg-[radial-gradient(120%_120%_at_0%_0%,rgba(255,215,0,0.02)_0%,transparent_45%),linear-gradient(180deg,rgba(255,255,255,0.02)_0%,rgba(0,0,0,0.24)_100%)] p-5 shadow-lg sm:p-6"
       )}
     >
       {market.status === "closed" && (
-        <p className="rounded-lg border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
+        <p className="body-sm rounded-lg border border-border bg-surface-alt px-3 py-2 text-sm text-muted-foreground">
           This market is closed.
         </p>
       )}
 
       <header className="space-y-1">
-        <h2 className="text-lg font-semibold leading-snug tracking-tight text-foreground sm:text-xl">
+        <h2 className="title-lg text-lg font-semibold tracking-[0.04em] text-foreground uppercase sm:text-xl">
           {headingFull}
         </h2>
         <p
           className={cn(
-            "font-mono text-sm tabular-nums",
+            "title-md text-sm tabular-nums",
             outcomeLeg === "yes" ? "text-yes-foreground" : "text-no-foreground"
           )}
         >
@@ -296,7 +297,7 @@ export function TradeTicket({
       </header>
 
       <div className="flex items-stretch gap-2">
-        <div className={cn("flex min-w-0 flex-1 gap-0.5 border border-border/40 bg-muted/15 p-0.5", controlRadius)}>
+        <div className={cn("flex min-w-0 flex-1 gap-0.5 border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.02)_0%,rgba(0,0,0,0.2)_100%)] p-0.5", controlRadius)}>
           <button
             type="button"
             disabled={market.status !== "open"}
@@ -305,10 +306,10 @@ export function TradeTicket({
               onUiChange({ kind: "idle" })
             }}
             className={cn(
-              `h-7 flex-1 px-2 text-[10px] font-semibold tracking-wide transition-colors ${controlInnerRadius}`,
+              `button-md h-7 flex-1 px-2 text-[10px] transition-colors ${controlInnerRadius}`,
               outcomeLeg === "yes"
-                ? "bg-yes text-background"
-                : "text-muted-foreground/85 hover:text-foreground/75"
+                ? "bg-[linear-gradient(180deg,rgba(0,122,102,0.3),rgba(0,122,102,0.2))] text-yes-foreground shadow-[inset_0_0_0_1px_rgba(0,122,102,0.22)]"
+                : "bg-transparent text-muted-foreground/85 hover:bg-white/[0.02] hover:text-foreground/75"
             )}
           >
             YES
@@ -321,10 +322,10 @@ export function TradeTicket({
               onUiChange({ kind: "idle" })
             }}
             className={cn(
-              `h-7 flex-1 px-2 text-[10px] font-semibold tracking-wide transition-colors ${controlInnerRadius}`,
+              `button-md h-7 flex-1 px-2 text-[10px] transition-colors ${controlInnerRadius}`,
               outcomeLeg === "no"
-                ? "bg-no text-background"
-                : "text-muted-foreground/85 hover:text-foreground/75"
+                ? "bg-[linear-gradient(180deg,rgba(255,64,80,0.28),rgba(255,64,80,0.18))] text-no-foreground shadow-[inset_0_0_0_1px_rgba(255,64,80,0.2)]"
+                : "bg-transparent text-muted-foreground/85 hover:bg-white/[0.02] hover:text-foreground/75"
             )}
           >
             NO
@@ -333,7 +334,7 @@ export function TradeTicket({
       </div>
 
       <div className="grid gap-2">
-        <Label htmlFor="trade-shares" className="text-xs text-muted-foreground">
+        <Label htmlFor="trade-shares">
           Shares
         </Label>
         <Input
@@ -345,12 +346,12 @@ export function TradeTicket({
             onSharesChange(e.target.value)
             onUiChange({ kind: "idle" })
           }}
-          className={cn("h-10 font-mono text-base tabular-nums", controlRadius)}
+          className={cn("h-10 title-md text-base tabular-nums", controlRadius)}
           placeholder="0"
         />
-        <p className="text-xs text-muted-foreground">
+        <p className="field-helper">
           Available{" "}
-          <span className="font-medium text-foreground">
+          <span className="title-md text-foreground">
             {formatUsd(balanceUsd)}
           </span>
         </p>
@@ -393,8 +394,8 @@ export function TradeTicket({
             type="button"
             disabled={market.status !== "open"}
             className={cn(
-              `inline-flex ${dropdownControlHeight} min-w-[5.8rem] shrink-0 items-center justify-center gap-1 border border-border/65 bg-muted/28 px-3 text-[10px] leading-none font-medium text-muted-foreground transition-colors ${controlRadius}`,
-              "cursor-pointer hover:border-border/80 hover:bg-muted/40 hover:text-foreground/90 disabled:cursor-default disabled:opacity-50"
+              `button-md inline-flex ${dropdownControlHeight} min-w-[5.8rem] shrink-0 items-center justify-center gap-1 border border-border px-3 text-[10px] leading-none text-muted-foreground transition-colors ${controlRadius} bg-surface-alt`,
+              "cursor-pointer bg-transparent hover:border-white/20 hover:text-foreground/90 disabled:cursor-default disabled:opacity-50"
             )}
           >
             {orderType === "market" ? "Market" : "Limit"}
@@ -402,7 +403,7 @@ export function TradeTicket({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="min-w-[7rem]">
             <DropdownMenuItem
-              className="text-xs"
+              className="button-md text-xs"
               onClick={() => {
                 onOrderTypeChange("market")
                 onUiChange({ kind: "idle" })
@@ -411,7 +412,7 @@ export function TradeTicket({
               Market
             </DropdownMenuItem>
             <DropdownMenuItem
-              className="text-xs"
+              className="button-md text-xs"
               onClick={() => {
                 onOrderTypeChange("limit")
                 onUiChange({ kind: "idle" })
@@ -427,7 +428,7 @@ export function TradeTicket({
         <div className="grid gap-2">
           <Label
             htmlFor="trade-limit"
-            className="text-xs text-muted-foreground"
+            className="field-label"
           >
             Limit price (0–1, e.g. 0.42)
           </Label>
@@ -440,30 +441,20 @@ export function TradeTicket({
               onLimitPriceStrChange(e.target.value)
               onUiChange({ kind: "idle" })
             }}
-            className="h-9 font-mono text-sm tabular-nums"
+            className="h-9 field-input text-sm tabular-nums"
             placeholder="0.42"
           />
         </div>
       )}
 
-      <div className={cn("grid gap-2 border border-border/50 bg-muted/15 px-3 py-2.5 font-mono text-xs tabular-nums sm:text-sm", controlRadius)}>
-        <div className="flex justify-between gap-3 text-muted-foreground">
-          <span>You pay</span>
-          <span className="font-medium text-foreground">
-            {sharesNum > 0 && px.ok ? formatUsd(youPay) : "—"}
+      <div className={cn("grid gap-1.5 border border-border-subtle bg-surface-alt px-3 py-2.5 tabular-nums", controlRadius)}>
+        <div className="flex items-baseline justify-between gap-3">
+          <span className="text-sm font-medium text-muted-foreground sm:text-[15px]">
+            Profit
           </span>
-        </div>
-        <div className="flex justify-between gap-3 text-muted-foreground">
-          <span>You win</span>
-          <span className="font-medium text-foreground">
-            {sharesNum > 0 && px.ok ? formatUsd(youWin) : "—"}
-          </span>
-        </div>
-        <div className="flex justify-between gap-3 text-muted-foreground">
-          <span>Profit</span>
           <span
             className={cn(
-              "font-medium",
+              "text-right text-2xl leading-none font-bold sm:text-[26px]",
               estProfit > 0 && "text-yes",
               estProfit < 0 && "text-no",
               estProfit === 0 && "text-foreground"
@@ -472,17 +463,29 @@ export function TradeTicket({
             {sharesNum > 0 && px.ok ? `${estProfit > 0 ? "+" : ""}${formatUsd(estProfit)}` : "—"}
           </span>
         </div>
+        <div className="mt-1 flex justify-between gap-3 text-xs text-muted-foreground sm:text-[13px]">
+          <span>You pay</span>
+          <span className="text-sm text-foreground sm:text-[15px]">
+            {sharesNum > 0 && px.ok ? formatUsd(youPay) : "—"}
+          </span>
+        </div>
+        <div className="flex justify-between gap-3 text-xs text-muted-foreground sm:text-[13px]">
+          <span>You win</span>
+          <span className="text-sm text-foreground sm:text-[15px]">
+            {sharesNum > 0 && px.ok ? formatUsd(youWin) : "—"}
+          </span>
+        </div>
       </div>
 
       {ui.kind === "error" && (
-        <p className="text-sm text-destructive" role="alert">
+        <p className="body-sm text-sm text-danger" role="alert">
           {ui.message}
           {ui.message.includes("Deposit") && (
             <>
               {" "}
               <button
                 type="button"
-                className="underline underline-offset-2 hover:text-foreground"
+                className="button-md text-xs underline underline-offset-2 hover:text-foreground"
                 onClick={() => openDeposit()}
               >
                 Deposit
@@ -492,20 +495,19 @@ export function TradeTicket({
         </p>
       )}
       {ui.kind === "success" && (
-        <p className="text-sm font-medium text-yes" role="status">
+        <p className="body-sm text-sm text-yes" role="status">
           Order filled — demo execution.
         </p>
       )}
 
       <Button
         type="button"
+        variant="primary"
         size="lg"
         disabled={disabled}
         onClick={() => void onSubmit()}
         className={cn(
-          `pressable h-10 w-full px-3 text-sm font-medium ${controlRadius}`,
-          "border border-transparent bg-foreground text-background",
-          "hover:bg-foreground/92 active:bg-foreground/88"
+          "pressable w-full border-0 shadow-[0_2px_8px_rgba(255,215,0,0.18)] hover:shadow-[0_3px_10px_rgba(255,215,0,0.22)] active:shadow-[0_1px_5px_rgba(255,215,0,0.14)]"
         )}
       >
         {ctaLabel}
@@ -515,40 +517,40 @@ export function TradeTicket({
 
       {openPos && !openPos.closedAt ? (
         <div className="grid gap-1.5 text-sm">
-          <span className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+          <span className="label-md text-muted-foreground">
             Your position ({outcomeLabel})
           </span>
-          <div className="flex flex-wrap gap-x-6 gap-y-1 font-mono text-xs tabular-nums text-muted-foreground sm:text-sm">
+          <div className="flex flex-wrap gap-x-6 gap-y-1 body-sm text-xs tabular-nums text-muted-foreground sm:text-sm">
             <span>
               Avg{" "}
-              <span className="text-foreground">
+              <span className="title-md text-foreground">
                 {Math.round(openPos.avgPrice * 100)}¢
               </span>
             </span>
             <span>
               Cost{" "}
-              <span className="text-foreground">
+              <span className="title-md text-foreground">
                 {formatUsd(openPos.costBasisUsd)}
               </span>
             </span>
             <span>
               Shares{" "}
-              <span className="text-foreground">
+              <span className="title-md text-foreground">
                 {openPos.shares.toFixed(2)}
               </span>
             </span>
           </div>
           <Link
             href="/positions"
-            className="text-xs font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+            className="button-md text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
           >
-            View in Positions
+            View in Portfolio
           </Link>
         </div>
       ) : null}
 
       {market.volumeUsd != null && (
-        <p className="text-center text-[11px] text-muted-foreground">
+        <p className="body-sm text-center text-[11px] text-muted-foreground">
           Vol. {formatUsdCompact(market.volumeUsd)} · Snapshot · session demo
         </p>
       )}

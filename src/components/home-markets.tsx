@@ -3,6 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { SlidersHorizontalIcon } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -19,7 +20,13 @@ import { cn } from "@/lib/utils"
 const THUMB_SIZE = "size-12" /* 48px */
 
 const chipBase =
-  "max-w-[160px] truncate rounded-md border px-2 py-1 font-mono text-[11px] tabular-nums transition-colors duration-150"
+  "button-md max-w-[160px] truncate rounded-md border px-2 py-1 text-[11px] tabular-nums transition-colors duration-150"
+const chipHoverNeutral =
+  "hover:border-white/[0.14] hover:text-white/95 hover:[background:linear-gradient(90deg,rgba(255,255,255,0.03)_0%,rgba(255,255,255,0.08)_50%,rgba(255,255,255,0.03)_100%)]"
+const chipHoverYes =
+  "hover:border-[rgba(0,122,102,0.55)] hover:[background:linear-gradient(90deg,rgba(0,122,102,0.08)_0%,rgba(0,122,102,0.18)_50%,rgba(0,122,102,0.08)_100%)]"
+const chipHoverNo =
+  "hover:border-[rgba(255,64,80,0.55)] hover:[background:linear-gradient(90deg,rgba(255,64,80,0.08)_0%,rgba(255,64,80,0.18)_50%,rgba(255,64,80,0.08)_100%)]"
 
 function cardInitials(title: string): string {
   const cleaned = title.replace(/[^\p{L}\p{N}\s]/gu, " ").trim()
@@ -50,8 +57,8 @@ function MarketThumbnail({
       <div
         className={cn(
           THUMB_SIZE,
-          "shrink-0 rounded-md border border-border/70 bg-muted/40",
-          "flex items-center justify-center font-mono text-xs font-medium text-muted-foreground"
+          "shrink-0 rounded-md bg-surface-alt",
+          "label-md flex items-center justify-center text-xs text-muted-foreground"
         )}
         aria-hidden
       >
@@ -67,7 +74,7 @@ function MarketThumbnail({
       alt=""
       className={cn(
         THUMB_SIZE,
-        "shrink-0 rounded-md border border-border/60 object-cover"
+        "shrink-0 rounded-md object-cover"
       )}
       loading="lazy"
       referrerPolicy="no-referrer"
@@ -93,8 +100,8 @@ function OutcomeChips({
           href={`${href}?outcome=${i}`}
           className={cn(
             chipBase,
-            "pressable cursor-pointer border-border/70 bg-muted/20 text-muted-foreground",
-            "hover:border-foreground/25 hover:bg-muted/35"
+            "pressable cursor-pointer border-border-subtle bg-surface-alt text-muted-foreground",
+            chipHoverNeutral
           )}
           onClick={(e) => e.stopPropagation()}
         >
@@ -107,7 +114,10 @@ function OutcomeChips({
       {rest > 0 ? (
         <Link
           href={href}
-          className="pressable cursor-pointer self-center rounded-md border border-border/65 bg-muted/15 px-2 py-1 font-mono text-[11px] text-muted-foreground transition-colors hover:border-foreground/25 hover:bg-muted/35 hover:text-foreground/85"
+          className={cn(
+            "pressable cursor-pointer self-center rounded-md border border-border-subtle bg-surface-alt px-2 py-1 font-mono text-[11px] text-muted-foreground transition-colors",
+            chipHoverNeutral
+          )}
           onClick={(e) => e.stopPropagation()}
         >
           +{rest}
@@ -130,29 +140,29 @@ function BinaryOutcomeChips({
         href={`${href}?side=yes`}
         className={cn(
           chipBase,
-          "pressable cursor-pointer border-yes/20 bg-yes-muted/15 text-muted-foreground",
-          "hover:border-yes/35 hover:bg-yes-muted/25"
+          "group pressable cursor-pointer border-yes/25 bg-surface-alt text-muted-foreground",
+          chipHoverYes
         )}
         onClick={(e) => e.stopPropagation()}
       >
         <span className="font-medium text-yes-foreground">
           {Math.round((market.contracts[0]?.yesPrice ?? 0) * 100)}%
         </span>{" "}
-        <span className="text-muted-foreground">Yes</span>
+        <span className="text-muted-foreground transition-colors group-hover:text-content-secondary">Yes</span>
       </Link>
       <Link
         href={`${href}?side=no`}
         className={cn(
           chipBase,
-          "pressable cursor-pointer border-no/20 bg-no-muted/15 text-muted-foreground",
-          "hover:border-no/35 hover:bg-no-muted/25"
+          "group pressable cursor-pointer border-no/25 bg-surface-alt text-muted-foreground",
+          chipHoverNo
         )}
         onClick={(e) => e.stopPropagation()}
       >
         <span className="font-medium text-no-foreground">
           {Math.round((market.contracts[0]?.noPrice ?? 0) * 100)}%
         </span>{" "}
-        <span className="text-muted-foreground">No</span>
+        <span className="text-muted-foreground transition-colors group-hover:text-content-secondary">No</span>
       </Link>
     </div>
   )
@@ -165,8 +175,8 @@ function MarketCard({ market }: { market: MarketViewModel }) {
   return (
     <div
       className={cn(
-        "surface-card group flex flex-col gap-3 p-4 transition-colors duration-150",
-        "hover:border-foreground/20 hover:bg-card/80"
+        "surface-card group flex flex-col gap-3 border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.02)_0%,rgba(0,0,0,0.22)_100%)] p-4 transition-colors duration-150",
+        "hover:border-border-strong"
       )}
     >
       <Link
@@ -178,25 +188,25 @@ function MarketCard({ market }: { market: MarketViewModel }) {
           <div className="flex items-start justify-between gap-2">
             <Badge
               variant="secondary"
-              className="max-w-[min(100%,11rem)] truncate text-[11px] font-normal"
+              className="max-w-[min(100%,11rem)] truncate text-[11px]"
             >
               {market.category}
             </Badge>
-            <span className="shrink-0 text-[11px] tabular-nums text-muted-foreground">
+            <span className="body-sm shrink-0 text-[11px] tabular-nums text-muted-foreground">
               {formatExpiry(market.expiresAt)}
             </span>
           </div>
-          <h2 className="text-sm font-medium leading-snug tracking-tight text-foreground">
+          <h2 className="title-md text-sm text-foreground">
             {market.question}
           </h2>
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground">
+          <div className="body-sm flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground">
             <span>Vol. {formatUsdCompact(market.volumeUsd)}</span>
             {market.status === "closed" ? (
-              <span className="rounded border border-border px-1.5 py-px text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+              <span className="label-md rounded border border-border px-1.5 py-px text-[10px] text-muted-foreground">
                 Closed
               </span>
             ) : (
-              <span className="font-medium text-yes">Live</span>
+              <span className="label-md text-yes">Active</span>
             )}
           </div>
         </div>
@@ -222,16 +232,17 @@ export function HomeMarkets({
 }) {
   const router = useRouter()
   const [q, setQ] = React.useState("")
+  const [filtersOpen, setFiltersOpen] = React.useState(false)
   const [category, setCategory] = React.useState<"All" | NavCategory>("All")
   const [timeFilter, setTimeFilter] = React.useState<
     "24H" | "7D" | "30D" | "All time"
   >("All time")
-  const [scope, setScope] = React.useState<"active" | "all">("active")
+  const [scope, setScope] = React.useState<"active" | "resolved">("active")
 
   const scopedMarkets = React.useMemo(
     () =>
       initialMarkets.filter((m) =>
-        scope === "active" ? m.status === "open" : true
+        scope === "active" ? m.status === "open" : m.status === "closed"
       ),
     [initialMarkets, scope]
   )
@@ -263,13 +274,16 @@ export function HomeMarkets({
     })
   }, [q, category, scopedMarkets])
 
+  const positionsLinkClass =
+    "button-md pressable inline-flex h-10 shrink-0 items-center justify-center rounded-lg border border-border-subtle bg-surface-alt px-3 text-xs text-muted-foreground transition-colors hover:border-border hover:bg-surface-hover hover:text-foreground sm:px-4 sm:text-sm"
+
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 pb-16 pt-8 sm:px-6 sm:pt-10">
-      <header className="max-w-2xl space-y-3">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
+    <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 pb-16 pt-6 sm:px-6 sm:pt-8">
+      <header className="mx-auto max-w-2xl space-y-1 text-center">
+        <h1 className="title-xl text-lg font-semibold tracking-[0.04em] text-foreground uppercase sm:text-xl">
           Predict outcomes. Trade instantly.
         </h1>
-        <p className="text-sm leading-relaxed text-muted-foreground">
+        <p className="body-md text-xs leading-relaxed text-muted-foreground sm:text-sm">
           Turn your insights into positions. Real-time markets, clear pricing,
           fast execution.
         </p>
@@ -277,7 +291,7 @@ export function HomeMarkets({
 
       {initialError ? (
         <div className="surface-card flex flex-col gap-3 border-destructive/30 p-6">
-          <p className="text-sm font-medium text-foreground">{initialError}</p>
+          <p className="body-md text-sm text-foreground">{initialError}</p>
           <Button
             type="button"
             variant="outline"
@@ -289,91 +303,129 @@ export function HomeMarkets({
         </div>
       ) : null}
 
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+      {/* Sticky discovery: search + controls (row 1), expandable filters + categories below */}
+      <div
+        className={cn(
+          "sticky top-14 z-30 -mx-4 border-b border-border/50 bg-background/90 px-4 py-3 shadow-[0_6px_20px_-12px_rgba(0,0,0,0.45)] backdrop-blur-md sm:-mx-6 sm:px-6"
+        )}
+      >
+        {/* Row 1: search + filter toggle + Portfolio */}
+        <div className="flex min-h-10 items-center gap-2">
           <Input
             placeholder="Search markets..."
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            className="h-10 w-full max-w-md border-border/80 bg-card/50"
+            className="h-10 min-w-0 flex-1 border-border bg-surface-alt sm:max-w-none"
           />
-          <div className="flex flex-wrap items-center gap-1">
-            {(["24H", "7D", "30D", "All time"] as const).map((t) => (
-              <button
-                key={t}
-                type="button"
-                onClick={() => {
-                  // TODO: connect to actual time-window filtering once historical aggregation is wired.
-                  setTimeFilter(t)
-                }}
-                className={cn(
-                  "pressable cursor-pointer shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
-                  timeFilter === t
-                    ? "border-foreground/30 bg-foreground text-background"
-                    : "border-border bg-card text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {t}
-              </button>
-            ))}
+          <button
+            type="button"
+            aria-label="Toggle filters"
+            aria-controls="market-reveal-filters"
+            aria-expanded={filtersOpen}
+            onClick={() => setFiltersOpen((prev) => !prev)}
+            className={cn(
+              "inline-flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-border-subtle bg-surface-alt text-muted-foreground transition-colors hover:border-border hover:bg-surface-hover hover:text-foreground",
+              filtersOpen && "border-border text-foreground"
+            )}
+          >
+            <SlidersHorizontalIcon className="size-4" aria-hidden />
+          </button>
+          <Link href="/positions" className={positionsLinkClass}>
+            Portfolio
+          </Link>
+        </div>
+
+        {/* Row 2: revealable time + status filters */}
+        <div
+          id="market-reveal-filters"
+          className={cn(
+            "overflow-hidden border-border/30 transition-all duration-200 ease-out",
+            filtersOpen
+              ? "mt-3 max-h-56 border-t pt-3 opacity-100"
+              : "max-h-0 border-t-0 pt-0 opacity-0"
+          )}
+        >
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+            <div className="flex gap-1 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:min-w-0 sm:flex-1 sm:pb-0">
+              {(["24H", "7D", "30D", "All time"] as const).map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => {
+                    setTimeFilter(t)
+                  }}
+                  className={cn(
+                    "pressable cursor-pointer shrink-0 rounded-full border px-3 py-1.5 text-xs font-display font-semibold transition-colors",
+                    timeFilter === t
+                      ? "border border-transparent text-primary shadow-[0_4px_12px_-8px_rgba(255,219,128,0.45)] [background:linear-gradient(hsl(var(--surface-alt)/0.9),hsl(var(--surface-alt)/0.9))_padding-box,linear-gradient(0deg,#ab7a00,#ffdb80)_border-box]"
+                      : cn("border-white/[0.08] bg-white/[0.02] text-foreground/70", chipHoverNeutral)
+                  )}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+            <Tabs
+              value={scope}
+              onValueChange={(v) => setScope(v as "active" | "resolved")}
+              className="w-full sm:w-auto sm:shrink-0"
+            >
+              <TabsList className="h-9 w-full bg-surface-alt sm:w-fit">
+                <TabsTrigger
+                  value="active"
+                  className="button-md flex-1 cursor-pointer text-xs transition-colors hover:text-foreground sm:flex-none"
+                >
+                  Active
+                </TabsTrigger>
+                <TabsTrigger
+                  value="resolved"
+                  className="button-md flex-1 cursor-pointer text-xs transition-colors hover:text-foreground sm:flex-none"
+                >
+                  Resolved
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
           </div>
         </div>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex gap-1 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {categories.map((c) => (
-              <button
-                key={c}
-                type="button"
-                onClick={() => setCategory(c)}
-                className={cn(
-                  "pressable cursor-pointer shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
-                  category === c
-                    ? "border-foreground/30 bg-foreground text-background"
-                    : "border-border bg-card text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {c}
-              </button>
-            ))}
-          </div>
-          <Tabs
-            value={scope}
-            onValueChange={(v) => setScope(v as "active" | "all")}
-            className="w-fit"
-          >
-            <TabsList className="h-9 bg-muted/40">
-              <TabsTrigger
-                value="active"
-                className="cursor-pointer text-xs transition-colors hover:text-foreground"
-              >
-                Active
-              </TabsTrigger>
-              <TabsTrigger
-                value="all"
-                className="cursor-pointer text-xs transition-colors hover:text-foreground"
-              >
-                All
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
+
+      </div>
+
+      {/* Category row scrolls with page (not sticky) */}
+      <div className="border-b border-border/30 pb-3">
+        <div className="flex gap-1 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {categories.map((c) => (
+            <button
+              key={c}
+              type="button"
+              onClick={() => setCategory(c)}
+              className={cn(
+                "pressable cursor-pointer shrink-0 rounded-full border px-3 py-1.5 text-xs font-display font-semibold transition-colors",
+                category === c
+                  ? "border border-transparent text-primary shadow-[0_4px_12px_-8px_rgba(255,219,128,0.45)] [background:linear-gradient(hsl(var(--surface-alt)/0.9),hsl(var(--surface-alt)/0.9))_padding-box,linear-gradient(0deg,#ab7a00,#ffdb80)_border-box]"
+                  : cn("border-white/[0.08] bg-white/[0.02] text-foreground/70", chipHoverNeutral)
+              )}
+            >
+              {c}
+            </button>
+          ))}
         </div>
       </div>
 
       {!initialError && filtered.length === 0 ? (
         <div className="surface-card flex flex-col items-start gap-3 p-8">
-          <p className="text-base font-medium text-foreground">
+          <p className="title-md text-base text-foreground">
             No markets match
           </p>
-          <p className="text-sm text-muted-foreground">
+          <p className="body-sm text-sm text-muted-foreground">
             Try another category or clear your search.
           </p>
           <button
             type="button"
-            className="text-sm font-medium text-foreground underline-offset-4 hover:underline"
+            className="button-md text-sm text-foreground underline-offset-4 hover:underline"
             onClick={() => {
               setQ("")
               setCategory("All")
-              setScope("all")
+              setScope("resolved")
             }}
           >
             Reset filters
