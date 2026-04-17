@@ -187,6 +187,7 @@ function FeaturedMarketHero({
   href: string
   hiddenOutcomes: number
 }) {
+  const router = useRouter()
   const CHART_W = 640
   const CHART_H = 320
   const AXIS_LEFT = 36
@@ -296,7 +297,16 @@ function FeaturedMarketHero({
   return (
     <div className="hidden lg:block">
       <div
-        className="group relative overflow-hidden rounded-xl border border-white/10 bg-[radial-gradient(120%_120%_at_0%_0%,rgba(255,215,120,0.06)_0%,rgba(255,255,255,0.01)_42%,rgba(0,0,0,0.28)_100%)] p-6 shadow-[0_20px_60px_-30px_rgba(0,0,0,0.9)]"
+        className="group relative cursor-pointer overflow-hidden rounded-xl border border-white/10 bg-[radial-gradient(120%_120%_at_0%_0%,rgba(255,215,120,0.06)_0%,rgba(255,255,255,0.01)_42%,rgba(0,0,0,0.28)_100%)] p-6 shadow-[0_20px_60px_-30px_rgba(0,0,0,0.9)]"
+        role="link"
+        tabIndex={0}
+        onClick={() => router.push(href)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault()
+            router.push(href)
+          }
+        }}
       >
         <div className="grid h-[400px] grid-cols-12 gap-6">
           <div className="col-span-5 flex min-h-0 flex-col">
