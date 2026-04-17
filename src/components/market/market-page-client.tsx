@@ -113,6 +113,7 @@ export function MarketPageClient({
       onSharesChange={setShares}
       ui={ui}
       onUiChange={setUi}
+      onClose={!isLg ? () => setSheetOpen(false) : undefined}
       onOrderFilled={() => setSheetOpen(false)}
     />
   )
@@ -150,7 +151,6 @@ export function MarketPageClient({
         <TradeTicketMobileSheet
           open={sheetOpen}
           onOpenChange={setSheetOpen}
-          title="Bet"
         >
           {ticket}
         </TradeTicketMobileSheet>

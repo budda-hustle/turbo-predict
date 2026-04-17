@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { XIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -56,6 +57,7 @@ export function TradeTicket({
   onSharesChange,
   ui,
   onUiChange,
+  onClose,
   onOrderFilled,
 }: {
   market: MarketViewModel
@@ -66,6 +68,7 @@ export function TradeTicket({
   onSharesChange: (v: string) => void
   ui: UiStatus
   onUiChange: React.Dispatch<React.SetStateAction<UiStatus>>
+  onClose?: () => void
   onOrderFilled?: () => void
 }) {
   const { placeOrder, balanceUsd, openDeposit } = useTrading()
@@ -184,9 +187,22 @@ export function TradeTicket({
   return (
     <div
       className={cn(
-        "surface-card flex flex-col gap-5 border border-white/8 bg-[radial-gradient(120%_120%_at_0%_0%,rgba(255,215,0,0.02)_0%,transparent_45%),linear-gradient(180deg,rgba(255,255,255,0.02)_0%,rgba(0,0,0,0.24)_100%)] p-5 shadow-lg sm:p-6"
+        "surface-card relative flex flex-col gap-5 border border-white/8 bg-[radial-gradient(120%_120%_at_0%_0%,rgba(255,215,0,0.02)_0%,transparent_45%),linear-gradient(180deg,rgba(255,255,255,0.02)_0%,rgba(0,0,0,0.24)_100%)] p-5 shadow-lg sm:p-6"
       )}
     >
+      {onClose ? (
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon-sm"
+          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"
+          onClick={onClose}
+          aria-label="Close betslip"
+        >
+          <XIcon className="size-4" />
+        </Button>
+      ) : null}
+
       {market.status === "closed" && (
         <p className="body-sm rounded-lg border border-border bg-surface-alt px-3 py-2 text-sm text-muted-foreground">
           This market is closed.

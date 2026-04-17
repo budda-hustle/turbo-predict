@@ -19,11 +19,11 @@ export function AppHeader() {
           priority
         />
         <Image
-          src="/demo-nav/header/logo.png"
-          alt="TurboPredict logo"
+          src="/demo-nav/header/logo.svg"
+          alt="Turbo Stars logo"
           width={3826}
           height={1000}
-          className="h-8 w-auto object-contain"
+          className="h-6 w-auto object-contain lg:ml-3 lg:h-8"
           priority
         />
       </div>

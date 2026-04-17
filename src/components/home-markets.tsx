@@ -90,7 +90,7 @@ function OutcomeChips({
     <div className="flex flex-col gap-1">
       {top.map((o, i) => (
         <div key={`${o.id}-${i}`} className="flex items-center gap-1">
-          <span className="min-w-0 flex-1 truncate text-xs text-foreground/90">
+          <span className="min-w-0 flex-1 truncate font-display text-xs text-foreground/90">
             {o.name}
           </span>
           <div className="flex shrink-0 items-center gap-0.5 sm:gap-1">
@@ -102,7 +102,7 @@ function OutcomeChips({
               )}
               onClick={(e) => e.stopPropagation()}
             >
-              <span className="font-medium text-yes-foreground">YES</span>
+              <span className="font-display font-medium text-yes-foreground">YES</span>
               <span className="tabular-nums text-yes-foreground">
                 {Math.round(o.yesPrice * 100)}%
               </span>
@@ -115,7 +115,7 @@ function OutcomeChips({
               )}
               onClick={(e) => e.stopPropagation()}
             >
-              <span className="font-medium text-no-foreground">NO</span>
+              <span className="font-display font-medium text-no-foreground">NO</span>
               <span className="tabular-nums text-no-foreground">
                 {Math.round((o.noPrice ?? 1 - o.yesPrice) * 100)}%
               </span>
@@ -147,7 +147,7 @@ function BinaryOutcomeChips({
         )}
         onClick={(e) => e.stopPropagation()}
       >
-        <span className="font-medium text-yes-foreground">YES</span>
+        <span className="font-display font-medium text-yes-foreground">YES</span>
         <span className="tabular-nums text-yes-foreground">{yesPct}%</span>
       </Link>
       <Link
@@ -158,7 +158,7 @@ function BinaryOutcomeChips({
         )}
         onClick={(e) => e.stopPropagation()}
       >
-        <span className="font-medium text-no-foreground">NO</span>
+        <span className="font-display font-medium text-no-foreground">NO</span>
         <span className="tabular-nums text-no-foreground">{noPct}%</span>
       </Link>
     </div>
@@ -313,7 +313,7 @@ function FeaturedMarketHero({
             <Badge variant="secondary" className="w-fit text-[11px]">
               {market.category}
             </Badge>
-            <h2 className="mt-3 text-3xl leading-tight font-semibold tracking-[0.01em] text-foreground">
+            <h2 className="mt-3 font-display text-3xl leading-tight font-semibold tracking-[0.01em] text-foreground">
               {market.question}
             </h2>
             <div className="mt-3 flex items-center gap-3 text-xs text-muted-foreground">
@@ -324,14 +324,14 @@ function FeaturedMarketHero({
             <div className="mt-auto space-y-2.5 pt-5">
               {topOutcomes.map((o, i) => (
                 <div key={o.id} className="flex items-center gap-2">
-                  <span className="min-w-0 flex-1 truncate text-sm text-foreground/90">{o.name}</span>
+                  <span className="min-w-0 flex-1 truncate font-display text-sm text-foreground/90">{o.name}</span>
                   <div className="flex min-w-[12.75rem] items-center justify-end gap-1.5">
                     <Link
                       href={`${href}?outcome=${i}&side=yes`}
                       className="pressable inline-flex h-8 min-w-[5.9rem] items-center justify-between rounded-md border border-yes/25 bg-[rgba(0,122,102,0.04)] px-2 text-xs transition-colors sm:min-w-[6.4rem] sm:max-w-[8rem] sm:flex-1 hover:border-[rgba(0,122,102,0.55)] hover:[background:linear-gradient(90deg,rgba(0,122,102,0.08)_0%,rgba(0,122,102,0.18)_50%,rgba(0,122,102,0.08)_100%)]"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <span className="font-medium text-yes-foreground">YES</span>
+                      <span className="font-display font-medium text-yes-foreground">YES</span>
                       <span className="tabular-nums text-yes-foreground">{Math.round(o.yesPrice * 100)}%</span>
                     </Link>
                     <Link
@@ -339,7 +339,7 @@ function FeaturedMarketHero({
                       className="pressable inline-flex h-8 min-w-[5.9rem] items-center justify-between rounded-md border border-no/25 bg-[rgba(255,64,80,0.04)] px-2 text-xs transition-colors sm:min-w-[6.4rem] sm:max-w-[8rem] sm:flex-1 hover:border-[rgba(255,64,80,0.55)] hover:[background:linear-gradient(90deg,rgba(255,64,80,0.08)_0%,rgba(255,64,80,0.18)_50%,rgba(255,64,80,0.08)_100%)]"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <span className="font-medium text-no-foreground">NO</span>
+                      <span className="font-display font-medium text-no-foreground">NO</span>
                       <span className="tabular-nums text-no-foreground">{Math.round(o.noPrice * 100)}%</span>
                     </Link>
                   </div>
@@ -543,7 +543,7 @@ function MarketCard({ market }: { market: MarketViewModel }) {
           <div className="flex items-start justify-between gap-2">
             <Badge
               variant="secondary"
-              className="max-w-[min(100%,11rem)] truncate text-[11px]"
+              className="max-w-[min(100%,11rem)] truncate bg-white/10 text-[11px]"
             >
               {market.category}
             </Badge>
@@ -561,7 +561,7 @@ function MarketCard({ market }: { market: MarketViewModel }) {
                 Closed
               </span>
             ) : (
-              <span className="label-md text-yes">Active</span>
+              <span className="label-md text-[10px] text-yes">Active</span>
             )}
           </div>
         </div>
