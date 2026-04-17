@@ -93,11 +93,11 @@ function OutcomeChips({
           <span className="min-w-0 flex-1 truncate text-xs text-foreground/90">
             {o.name}
           </span>
-          <div className="flex shrink-0 items-center gap-0.5">
+          <div className="flex shrink-0 items-center gap-0.5 sm:gap-1">
             <Link
               href={`${href}?outcome=${i}&side=yes`}
               className={cn(
-                "pressable inline-flex h-6 min-w-[4.25rem] items-center justify-between rounded-md border border-yes/25 bg-surface-alt px-1.5 text-[10px] transition-colors",
+                "pressable inline-flex h-6 min-w-[4.25rem] items-center justify-between rounded-md border border-yes/25 bg-[rgba(0,122,102,0.04)] px-1.5 text-[10px] transition-colors sm:min-w-[5.5rem] sm:max-w-[7.5rem] sm:flex-1 sm:px-2",
                 "hover:border-[rgba(0,122,102,0.55)] hover:[background:linear-gradient(90deg,rgba(0,122,102,0.08)_0%,rgba(0,122,102,0.18)_50%,rgba(0,122,102,0.08)_100%)]"
               )}
               onClick={(e) => e.stopPropagation()}
@@ -110,7 +110,7 @@ function OutcomeChips({
             <Link
               href={`${href}?outcome=${i}&side=no`}
               className={cn(
-                "pressable inline-flex h-6 min-w-[4.25rem] items-center justify-between rounded-md border border-no/25 bg-surface-alt px-1.5 text-[10px] transition-colors",
+                "pressable inline-flex h-6 min-w-[4.25rem] items-center justify-between rounded-md border border-no/25 bg-[rgba(255,64,80,0.04)] px-1.5 text-[10px] transition-colors sm:min-w-[5.5rem] sm:max-w-[7.5rem] sm:flex-1 sm:px-2",
                 "hover:border-[rgba(255,64,80,0.55)] hover:[background:linear-gradient(90deg,rgba(255,64,80,0.08)_0%,rgba(255,64,80,0.18)_50%,rgba(255,64,80,0.08)_100%)]"
               )}
               onClick={(e) => e.stopPropagation()}
@@ -123,18 +123,7 @@ function OutcomeChips({
           </div>
         </div>
       ))}
-      {rest > 0 ? (
-        <Link
-          href={href}
-          className={cn(
-            "pressable mt-0.5 inline-flex h-6 w-full cursor-pointer items-center justify-center rounded-md border border-border-subtle bg-surface-alt px-1.5 text-[10px] text-muted-foreground transition-colors",
-            chipHoverNeutral
-          )}
-          onClick={(e) => e.stopPropagation()}
-        >
-          +{rest} more outcomes
-        </Link>
-      ) : null}
+      {rest > 0 ? <p className="mt-1 pl-0.5 text-[11px] text-muted-foreground/70">+{rest} more outcomes</p> : null}
     </div>
   )
 }
@@ -149,11 +138,11 @@ function BinaryOutcomeChips({
   const yesPct = Math.round((market.contracts[0]?.yesPrice ?? 0) * 100)
   const noPct = Math.round((market.contracts[0]?.noPrice ?? 0) * 100)
   return (
-    <div className="grid grid-cols-2 gap-2">
+    <div className="grid grid-cols-2 gap-2 lg:gap-2.5">
       <Link
         href={`${href}?side=yes`}
         className={cn(
-          "pressable inline-flex h-10 items-center justify-between rounded-md border border-yes/25 bg-surface-alt px-3 text-sm transition-colors",
+          "pressable inline-flex h-10 items-center justify-between rounded-md border border-yes/25 bg-[rgba(0,122,102,0.04)] px-3 text-sm transition-colors lg:px-3.5",
           "hover:border-[rgba(0,122,102,0.55)] hover:[background:linear-gradient(90deg,rgba(0,122,102,0.08)_0%,rgba(0,122,102,0.18)_50%,rgba(0,122,102,0.08)_100%)]"
         )}
         onClick={(e) => e.stopPropagation()}
@@ -164,7 +153,7 @@ function BinaryOutcomeChips({
       <Link
         href={`${href}?side=no`}
         className={cn(
-          "pressable inline-flex h-10 items-center justify-between rounded-md border border-no/25 bg-surface-alt px-3 text-sm transition-colors",
+          "pressable inline-flex h-10 items-center justify-between rounded-md border border-no/25 bg-[rgba(255,64,80,0.04)] px-3 text-sm transition-colors lg:px-3.5",
           "hover:border-[rgba(255,64,80,0.55)] hover:[background:linear-gradient(90deg,rgba(255,64,80,0.08)_0%,rgba(255,64,80,0.18)_50%,rgba(255,64,80,0.08)_100%)]"
         )}
         onClick={(e) => e.stopPropagation()}
@@ -326,10 +315,10 @@ function FeaturedMarketHero({
               {topOutcomes.map((o, i) => (
                 <div key={o.id} className="flex items-center gap-2">
                   <span className="min-w-0 flex-1 truncate text-sm text-foreground/90">{o.name}</span>
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex min-w-[12.75rem] items-center justify-end gap-1.5">
                     <Link
                       href={`${href}?outcome=${i}&side=yes`}
-                      className="pressable inline-flex h-8 min-w-[6.25rem] items-center justify-between rounded-md border border-yes/25 bg-surface-alt px-2.5 text-xs transition-colors hover:border-[rgba(0,122,102,0.55)] hover:[background:linear-gradient(90deg,rgba(0,122,102,0.08)_0%,rgba(0,122,102,0.18)_50%,rgba(0,122,102,0.08)_100%)]"
+                      className="pressable inline-flex h-8 min-w-[5.9rem] items-center justify-between rounded-md border border-yes/25 bg-[rgba(0,122,102,0.04)] px-2 text-xs transition-colors sm:min-w-[6.4rem] sm:max-w-[8rem] sm:flex-1 hover:border-[rgba(0,122,102,0.55)] hover:[background:linear-gradient(90deg,rgba(0,122,102,0.08)_0%,rgba(0,122,102,0.18)_50%,rgba(0,122,102,0.08)_100%)]"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <span className="font-medium text-yes-foreground">YES</span>
@@ -337,7 +326,7 @@ function FeaturedMarketHero({
                     </Link>
                     <Link
                       href={`${href}?outcome=${i}&side=no`}
-                      className="pressable inline-flex h-8 min-w-[6.25rem] items-center justify-between rounded-md border border-no/25 bg-surface-alt px-2.5 text-xs transition-colors hover:border-[rgba(255,64,80,0.55)] hover:[background:linear-gradient(90deg,rgba(255,64,80,0.08)_0%,rgba(255,64,80,0.18)_50%,rgba(255,64,80,0.08)_100%)]"
+                      className="pressable inline-flex h-8 min-w-[5.9rem] items-center justify-between rounded-md border border-no/25 bg-[rgba(255,64,80,0.04)] px-2 text-xs transition-colors sm:min-w-[6.4rem] sm:max-w-[8rem] sm:flex-1 hover:border-[rgba(255,64,80,0.55)] hover:[background:linear-gradient(90deg,rgba(255,64,80,0.08)_0%,rgba(255,64,80,0.18)_50%,rgba(255,64,80,0.08)_100%)]"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <span className="font-medium text-no-foreground">NO</span>
@@ -347,46 +336,41 @@ function FeaturedMarketHero({
                 </div>
               ))}
               {hiddenOutcomes > 0 ? (
-                <Link
-                  href={href}
-                  className={cn(
-                    "pressable inline-flex h-8 w-full items-center justify-center rounded-md border border-border-subtle bg-surface-alt text-xs text-muted-foreground transition-colors",
-                    chipHoverNeutral
-                  )}
-                  onClick={(e) => e.stopPropagation()}
-                >
+                <p className="mt-1 pl-0.5 text-xs text-muted-foreground/70">
                   +{hiddenOutcomes} more outcomes
-                </Link>
+                </p>
               ) : null}
             </div>
           </div>
 
-          <div className="relative col-span-7 min-h-0 overflow-hidden p-1">
-            {ambientClouds.map((cloud) => (
+          <div className="col-span-7 min-h-0">
+            <div className="relative h-full overflow-visible p-1">
+              {ambientClouds.map((cloud) => (
+                <div
+                  key={`cloud-${cloud.id}`}
+                  className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 rounded-full"
+                  style={{
+                    left: `${cloud.xPct}%`,
+                    top: `${cloud.yPct}%`,
+                    width: `${cloud.size}px`,
+                    height: `${cloud.size}px`,
+                    background: cloud.color,
+                    opacity: cloud.opacity,
+                    filter: "blur(100px)",
+                  }}
+                  aria-hidden
+                />
+              ))}
               <div
-                key={`cloud-${cloud.id}`}
-                className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 rounded-full"
+                className="pointer-events-none absolute inset-0"
                 style={{
-                  left: `${cloud.xPct}%`,
-                  top: `${cloud.yPct}%`,
-                  width: `${cloud.size}px`,
-                  height: `${cloud.size}px`,
-                  background: cloud.color,
-                  opacity: cloud.opacity,
-                  filter: "blur(100px)",
+                  background:
+                    "radial-gradient(120% 120% at 50% 50%, rgba(0,0,0,0)_44%, rgba(0,0,0,0.2)_100%)",
                 }}
                 aria-hidden
               />
-            ))}
-            <div
-              className="pointer-events-none absolute inset-0"
-              style={{
-                background:
-                  "radial-gradient(120% 120% at 50% 50%, rgba(0,0,0,0)_46%, rgba(0,0,0,0.28)_100%)",
-              }}
-              aria-hidden
-            />
-            <svg viewBox={`0 0 ${CHART_W} ${CHART_H}`} className="h-full w-full">
+              <div className="relative h-full w-full [mask-image:radial-gradient(120%_120%_at_50%_50%,black_60%,transparent_100%)]">
+                <svg viewBox={`0 0 ${CHART_W} ${CHART_H}`} className="h-full w-full overflow-visible">
               <defs>
                 <filter id={`hero-glow-${market.id}`} x="-30%" y="-30%" width="160%" height="160%">
                   <feGaussianBlur stdDeviation="2.6" result="blur" />
@@ -497,21 +481,23 @@ function FeaturedMarketHero({
                   />
                 ))}
               </g>
-            </svg>
-            <div className="pointer-events-none absolute top-2 right-2 flex max-w-[44%] flex-wrap justify-end gap-x-2.5 gap-y-1 text-[10px] text-white/42">
-              {lines.slice(0, 6).map((line) => (
-                <div key={`legend-${line.id}`} className="inline-flex items-center gap-1">
-                  <span
-                    className="size-1.5 rounded-full"
-                    style={{
-                      backgroundColor: line.color,
-                      boxShadow: `0 0 8px ${line.color}66`,
-                    }}
-                    aria-hidden
-                  />
-                  <span className="truncate max-w-[7.5rem]">{line.name}</span>
-                </div>
-              ))}
+                </svg>
+              </div>
+              <div className="pointer-events-none absolute top-2 right-2 flex max-w-[44%] flex-wrap justify-end gap-x-2.5 gap-y-1 text-[10px] text-white/42">
+                {lines.slice(0, 6).map((line) => (
+                  <div key={`legend-${line.id}`} className="inline-flex items-center gap-1">
+                    <span
+                      className="size-1.5 rounded-full"
+                      style={{
+                        backgroundColor: line.color,
+                        boxShadow: `0 0 8px ${line.color}66`,
+                      }}
+                      aria-hidden
+                    />
+                    <span className="truncate max-w-[7.5rem]">{line.name}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -521,20 +507,27 @@ function FeaturedMarketHero({
 }
 
 function MarketCard({ market }: { market: MarketViewModel }) {
+  const router = useRouter()
   const href = `/market/${encodeURIComponent(market.slug)}`
   const isBinary = market.marketType === "binary"
 
   return (
     <div
       className={cn(
-        "surface-card group flex h-full flex-col gap-3 border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.02)_0%,rgba(0,0,0,0.22)_100%)] p-4 transition-colors duration-150",
+        "surface-card group flex h-full cursor-pointer flex-col gap-3 border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.02)_0%,rgba(0,0,0,0.22)_100%)] p-4 transition-colors duration-150",
         "hover:border-border-strong"
       )}
+      role="link"
+      tabIndex={0}
+      onClick={() => router.push(href)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault()
+          router.push(href)
+        }
+      }}
     >
-      <Link
-        href={href}
-        className="flex gap-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-      >
+      <div className="flex gap-3 text-left">
         <MarketThumbnail imageUrl={market.image} title={market.question} />
         <div className="min-w-0 flex-1 space-y-2">
           <div className="flex items-start justify-between gap-2">
@@ -562,7 +555,7 @@ function MarketCard({ market }: { market: MarketViewModel }) {
             )}
           </div>
         </div>
-      </Link>
+      </div>
 
       <div className="mt-auto border-t border-border/50 pt-3">
         {isBinary ? (
