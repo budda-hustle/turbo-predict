@@ -19,14 +19,8 @@ import { cn } from "@/lib/utils"
 
 const THUMB_SIZE = "size-12" /* 48px */
 
-const chipBase =
-  "button-md max-w-[160px] truncate rounded-md border px-2 py-1 text-[11px] tabular-nums transition-colors duration-150"
 const chipHoverNeutral =
   "hover:border-white/[0.14] hover:text-white/95 hover:[background:linear-gradient(90deg,rgba(255,255,255,0.03)_0%,rgba(255,255,255,0.08)_50%,rgba(255,255,255,0.03)_100%)]"
-const chipHoverYes =
-  "hover:border-[rgba(0,122,102,0.55)] hover:[background:linear-gradient(90deg,rgba(0,122,102,0.08)_0%,rgba(0,122,102,0.18)_50%,rgba(0,122,102,0.08)_100%)]"
-const chipHoverNo =
-  "hover:border-[rgba(255,64,80,0.55)] hover:[background:linear-gradient(90deg,rgba(255,64,80,0.08)_0%,rgba(255,64,80,0.18)_50%,rgba(255,64,80,0.08)_100%)]"
 
 function cardInitials(title: string): string {
   const cleaned = title.replace(/[^\p{L}\p{N}\s]/gu, " ").trim()
@@ -90,37 +84,55 @@ function OutcomeChips({
   market: MarketViewModel
   href: string
 }) {
-  const top = market.contracts.slice(0, 4)
+  const top = market.contracts.slice(0, 2)
   const rest = market.contracts.length - top.length
   return (
-    <div className="flex flex-wrap gap-1.5">
+    <div className="flex flex-col gap-1">
       {top.map((o, i) => (
-        <Link
-          key={`${o.id}-${i}`}
-          href={`${href}?outcome=${i}`}
-          className={cn(
-            chipBase,
-            "pressable cursor-pointer border-border-subtle bg-surface-alt text-muted-foreground",
-            chipHoverNeutral
-          )}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <span className="font-medium text-foreground">
-            {Math.round(o.yesPrice * 100)}%
-          </span>{" "}
-          <span className="text-muted-foreground">{o.name}</span>
-        </Link>
+        <div key={`${o.id}-${i}`} className="flex items-center gap-1">
+          <span className="min-w-0 flex-1 truncate text-xs text-foreground/90">
+            {o.name}
+          </span>
+          <div className="flex shrink-0 items-center gap-0.5">
+            <Link
+              href={`${href}?outcome=${i}&side=yes`}
+              className={cn(
+                "pressable inline-flex h-6 min-w-[4.25rem] items-center justify-between rounded-md border border-yes/25 bg-surface-alt px-1.5 text-[10px] transition-colors",
+                "hover:border-[rgba(0,122,102,0.55)] hover:[background:linear-gradient(90deg,rgba(0,122,102,0.08)_0%,rgba(0,122,102,0.18)_50%,rgba(0,122,102,0.08)_100%)]"
+              )}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <span className="font-medium text-yes-foreground">YES</span>
+              <span className="tabular-nums text-yes-foreground">
+                {Math.round(o.yesPrice * 100)}%
+              </span>
+            </Link>
+            <Link
+              href={`${href}?outcome=${i}&side=no`}
+              className={cn(
+                "pressable inline-flex h-6 min-w-[4.25rem] items-center justify-between rounded-md border border-no/25 bg-surface-alt px-1.5 text-[10px] transition-colors",
+                "hover:border-[rgba(255,64,80,0.55)] hover:[background:linear-gradient(90deg,rgba(255,64,80,0.08)_0%,rgba(255,64,80,0.18)_50%,rgba(255,64,80,0.08)_100%)]"
+              )}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <span className="font-medium text-no-foreground">NO</span>
+              <span className="tabular-nums text-no-foreground">
+                {Math.round((o.noPrice ?? 1 - o.yesPrice) * 100)}%
+              </span>
+            </Link>
+          </div>
+        </div>
       ))}
       {rest > 0 ? (
         <Link
           href={href}
           className={cn(
-            "pressable cursor-pointer self-center rounded-md border border-border-subtle bg-surface-alt px-2 py-1 font-mono text-[11px] text-muted-foreground transition-colors",
+            "pressable mt-0.5 inline-flex h-6 w-full cursor-pointer items-center justify-center rounded-md border border-border-subtle bg-surface-alt px-1.5 text-[10px] text-muted-foreground transition-colors",
             chipHoverNeutral
           )}
           onClick={(e) => e.stopPropagation()}
         >
-          +{rest}
+          +{rest} more outcomes
         </Link>
       ) : null}
     </div>
@@ -134,35 +146,31 @@ function BinaryOutcomeChips({
   market: MarketViewModel
   href: string
 }) {
+  const yesPct = Math.round((market.contracts[0]?.yesPrice ?? 0) * 100)
+  const noPct = Math.round((market.contracts[0]?.noPrice ?? 0) * 100)
   return (
-    <div className="flex flex-wrap gap-1.5">
+    <div className="grid grid-cols-2 gap-2">
       <Link
         href={`${href}?side=yes`}
         className={cn(
-          chipBase,
-          "group pressable cursor-pointer border-yes/25 bg-surface-alt text-muted-foreground",
-          chipHoverYes
+          "pressable inline-flex h-10 items-center justify-between rounded-md border border-yes/25 bg-surface-alt px-3 text-sm transition-colors",
+          "hover:border-[rgba(0,122,102,0.55)] hover:[background:linear-gradient(90deg,rgba(0,122,102,0.08)_0%,rgba(0,122,102,0.18)_50%,rgba(0,122,102,0.08)_100%)]"
         )}
         onClick={(e) => e.stopPropagation()}
       >
-        <span className="font-medium text-yes-foreground">
-          {Math.round((market.contracts[0]?.yesPrice ?? 0) * 100)}%
-        </span>{" "}
-        <span className="text-muted-foreground transition-colors group-hover:text-content-secondary">Yes</span>
+        <span className="font-medium text-yes-foreground">YES</span>
+        <span className="tabular-nums text-yes-foreground">{yesPct}%</span>
       </Link>
       <Link
         href={`${href}?side=no`}
         className={cn(
-          chipBase,
-          "group pressable cursor-pointer border-no/25 bg-surface-alt text-muted-foreground",
-          chipHoverNo
+          "pressable inline-flex h-10 items-center justify-between rounded-md border border-no/25 bg-surface-alt px-3 text-sm transition-colors",
+          "hover:border-[rgba(255,64,80,0.55)] hover:[background:linear-gradient(90deg,rgba(255,64,80,0.08)_0%,rgba(255,64,80,0.18)_50%,rgba(255,64,80,0.08)_100%)]"
         )}
         onClick={(e) => e.stopPropagation()}
       >
-        <span className="font-medium text-no-foreground">
-          {Math.round((market.contracts[0]?.noPrice ?? 0) * 100)}%
-        </span>{" "}
-        <span className="text-muted-foreground transition-colors group-hover:text-content-secondary">No</span>
+        <span className="font-medium text-no-foreground">NO</span>
+        <span className="tabular-nums text-no-foreground">{noPct}%</span>
       </Link>
     </div>
   )
