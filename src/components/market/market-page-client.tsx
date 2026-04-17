@@ -4,6 +4,7 @@ import * as React from "react"
 
 import { MarketActivityBlock } from "@/components/market/market-activity-block"
 import { MarketHero } from "@/components/market/market-hero"
+import { MarketMultiOutcomeHeroChart } from "@/components/market/market-multi-outcome-hero-chart"
 import { MarketPageLayout } from "@/components/market/market-page-layout"
 import { OutcomeList } from "@/components/market/outcome-list"
 import { MarketContextRulesTabs } from "@/components/market/sections/market-context-rules-tabs"
@@ -12,12 +13,7 @@ import { TradeTicketMobileSheet } from "@/components/market/trade-ticket/trade-t
 import { TradeTicketSidebar } from "@/components/market/trade-ticket/trade-ticket-sidebar"
 import type { MarketViewModel } from "@/lib/market-view-model"
 import { useMediaQuery } from "@/lib/use-media-query"
-import type {
-  OrderExecutionType,
-  OrderFlow,
-  OutcomeLeg,
-} from "@/lib/trading-context"
-import { useTrading } from "@/lib/trading-context"
+import type { OutcomeLeg } from "@/lib/trading-context"
 
 type UiStatus =
   | { kind: "idle" }
@@ -35,7 +31,6 @@ export function MarketPageClient({
   initialOutcomeLeg: OutcomeLeg
 }) {
   const isLg = useMediaQuery("(min-width: 1024px)", false)
-  const { getOpenPosition } = useTrading()
 
   const [selectedContractId, setSelectedContractId] = React.useState(() => {
     if (
@@ -53,9 +48,6 @@ export function MarketPageClient({
   const [sheetOpen, setSheetOpen] = React.useState(false)
 
   const [shares, setShares] = React.useState("10")
-  const [flow, setFlow] = React.useState<OrderFlow>("buy")
-  const [orderType, setOrderType] = React.useState<OrderExecutionType>("market")
-  const [limitPriceStr, setLimitPriceStr] = React.useState("")
   const [ui, setUi] = React.useState<UiStatus>({ kind: "idle" })
 
   React.useEffect(() => {
@@ -94,22 +86,6 @@ export function MarketPageClient({
     [market.contracts, selectedContractId]
   )
 
-  const selectedContractIndex = React.useMemo(
-    () =>
-      Math.max(
-        0,
-        market.contracts.findIndex((c) => c.id === selectedContract.id)
-      ),
-    [market.contracts, selectedContract.id]
-  )
-
-  const openPos = getOpenPosition(market.slug, selectedContractIndex, outcomeLeg)
-  const canSell = Boolean(openPos && openPos.shares > 0 && !openPos.closedAt)
-
-  React.useEffect(() => {
-    if (flow === "sell" && !canSell) setFlow("buy")
-  }, [flow, canSell])
-
   function selectContract(contractId: string) {
     setSelectedContractId(contractId)
     setOutcomeLeg("yes")
@@ -119,7 +95,6 @@ export function MarketPageClient({
   function tradeFromContractSide(contractId: string, leg: OutcomeLeg) {
     setSelectedContractId(contractId)
     setOutcomeLeg(leg)
-    setFlow("buy")
     setUi({ kind: "idle" })
     if (!isLg) setSheetOpen(true)
   }
@@ -136,12 +111,6 @@ export function MarketPageClient({
       onOutcomeLegChange={setOutcomeLeg}
       shares={shares}
       onSharesChange={setShares}
-      flow={flow}
-      onFlowChange={setFlow}
-      orderType={orderType}
-      onOrderTypeChange={setOrderType}
-      limitPriceStr={limitPriceStr}
-      onLimitPriceStrChange={setLimitPriceStr}
       ui={ui}
       onUiChange={setUi}
       onOrderFilled={() => setSheetOpen(false)}
@@ -151,6 +120,9 @@ export function MarketPageClient({
   const main = (
     <>
       <MarketHero market={market} />
+      {market.marketType === "multi" ? (
+        <MarketMultiOutcomeHeroChart market={market} />
+      ) : null}
       <MarketContextRulesTabs market={market} />
       <OutcomeList
         market={market}
@@ -178,7 +150,7 @@ export function MarketPageClient({
         <TradeTicketMobileSheet
           open={sheetOpen}
           onOpenChange={setSheetOpen}
-          title="Trade"
+          title="Bet"
         >
           {ticket}
         </TradeTicketMobileSheet>

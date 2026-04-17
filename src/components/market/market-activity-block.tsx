@@ -172,22 +172,21 @@ export function MarketActivityBlock({ market }: { market: MarketViewModel }) {
                 !row.isLarge && "font-normal opacity-95"
               )}
             >
-              <span className="label-md text-content-secondary">{row.verb}</span>{" "}
-              <span
-                className={cn(
-                  "font-medium",
-                  row.contractSide === "yes" ? "text-yes" : "text-no"
-                )}
-              >
-                {row.contractSide.toUpperCase()}
-              </span>{" "}
-              <span className="text-activity-foreground">{row.sizeStr}</span>{" "}
-              <span className="text-activity-muted">@</span>{" "}
-              <span className="text-activity-foreground">{row.cents}¢</span>{" "}
-              <span className="text-activity-muted">·</span>{" "}
-              <span className="text-activity-muted">{row.rel}</span>{" "}
-              <span className="text-activity-muted">·</span>{" "}
-              <span className="text-activity-muted">{row.user}</span>
+              <div className="inline-grid grid-cols-[8.75rem_3.125rem_5.625rem_3.75rem_3.125rem_auto] items-baseline gap-x-2">
+                <span className="label-md truncate text-content-secondary">{row.verb}</span>
+                <span
+                  className={cn(
+                    "text-left font-medium",
+                    row.contractSide === "yes" ? "text-yes" : "text-no"
+                  )}
+                >
+                  {row.contractSide.toUpperCase()}
+                </span>
+                <span className="text-right text-activity-foreground">${row.sizeStr}</span>
+                <span className="text-right text-activity-foreground">{row.cents}%</span>
+                <span className="text-right text-activity-muted">{row.rel}</span>
+                <span className="truncate text-activity-muted">{row.user}</span>
+              </div>
             </li>
           ))}
         </ul>

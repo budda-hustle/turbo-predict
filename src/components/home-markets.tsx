@@ -331,7 +331,7 @@ export function HomeMarkets({
             <SlidersHorizontalIcon className="size-4" aria-hidden />
           </button>
           <Link href="/positions" className={positionsLinkClass}>
-            Portfolio
+            My bets
           </Link>
         </div>
 

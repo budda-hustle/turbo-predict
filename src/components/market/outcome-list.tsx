@@ -25,11 +25,11 @@ function deltaStr(delta: number): string {
 }
 
 /**
- * Fixed width so every row aligns; fits "100¢ Buy Yes" / "100¢ Buy No" at 11px mono
+ * Fixed width so every row aligns; fits "YES 100%" / "NO 100%" at 11px mono
  * without truncate (see home `chipBase` for card chips only).
  */
 const tradeOutcomeChip =
-  "button-md inline-flex h-8 w-[10.75rem] shrink-0 items-center justify-center gap-0.5 whitespace-nowrap rounded-md border px-2.5 text-xs tabular-nums transition-colors duration-150"
+  "button-md inline-flex h-8 w-[10.75rem] shrink-0 items-center justify-between whitespace-nowrap rounded-md border px-2.5 text-xs tabular-nums transition-colors duration-150"
 
 export function OutcomeList({
   market,
@@ -186,10 +186,10 @@ export function OutcomeList({
                         onTradeSide(c.id, "yes")
                       }}
                     >
-                      <span className="title-md text-yes-foreground">{yesCents}¢</span>{" "}
                       <span className={cn(yesSelected ? "text-yes-foreground" : "text-muted-foreground")}>
-                        Buy Yes
+                        YES
                       </span>
+                      <span className="title-md text-yes-foreground">{yesCents}%</span>
                     </button>
                     <button
                       type="button"
@@ -208,10 +208,10 @@ export function OutcomeList({
                         onTradeSide(c.id, "no")
                       }}
                     >
-                      <span className="title-md text-no-foreground">{noCents}¢</span>{" "}
                       <span className={cn(noSelected ? "text-no-foreground" : "text-muted-foreground")}>
-                        Buy No
+                        NO
                       </span>
+                      <span className="title-md text-no-foreground">{noCents}%</span>
                     </button>
                   </div>
                 </div>
@@ -297,10 +297,10 @@ export function OutcomeList({
                         onTradeSide(c.id, "yes")
                       }}
                     >
-                      <span className="title-md text-yes-foreground">{yesCents}¢</span>{" "}
                       <span className={cn(yesSelected ? "text-yes-foreground" : "text-muted-foreground")}>
-                        Buy Yes
+                        YES
                       </span>
+                      <span className="title-md text-yes-foreground">{yesCents}%</span>
                     </button>
                     <button
                       type="button"
@@ -319,10 +319,10 @@ export function OutcomeList({
                         onTradeSide(c.id, "no")
                       }}
                     >
-                      <span className="title-md text-no-foreground">{noCents}¢</span>{" "}
                       <span className={cn(noSelected ? "text-no-foreground" : "text-muted-foreground")}>
-                        Buy No
+                        NO
                       </span>
+                      <span className="title-md text-no-foreground">{noCents}%</span>
                     </button>
                   </div>
                 </div>

@@ -6,7 +6,15 @@ import { formatUsd } from "@/lib/markets"
 import type { Position } from "@/lib/trading-context"
 import { cn } from "@/lib/utils"
 
-export function PositionCard({ position }: { position: Position }) {
+type SettledResult = "Won" | "Lost" | "Cashed out"
+
+export function PositionCard({
+  position,
+  settledResult,
+}: {
+  position: Position
+  settledResult?: SettledResult
+}) {
   const question = position.question || "Market"
   const currentPrice = position.closedAt ? null : position.markPrice
 
@@ -28,13 +36,13 @@ export function PositionCard({ position }: { position: Position }) {
     position.closedAt && position.settledPnlUsd != null
       ? position.costBasisUsd + Math.max(position.settledPnlUsd, 0)
       : position.shares
-  const valueUsd =
-    currentPrice != null
-      ? position.shares * currentPrice
-      : position.costBasisUsd + (position.settledPnlUsd ?? 0)
 
   const isResolved = Boolean(position.closedAt)
-  const isWinningResolved = isResolved && (position.settledPnlUsd ?? 0) > 0
+  const resultLabel: SettledResult | undefined = isResolved
+    ? settledResult ?? ((position.settledPnlUsd ?? 0) > 0 ? "Won" : "Lost")
+    : undefined
+  const metricItemClass = "text-xs font-medium tabular-nums text-muted-foreground"
+  const metricValueClass = "text-xs font-medium text-foreground"
 
   return (
     <div
@@ -62,23 +70,20 @@ export function PositionCard({ position }: { position: Position }) {
             </span>
           )}
         </div>
-        {isResolved ? (
-          isWinningResolved ? (
-            <button
-              type="button"
-              className="button-md shrink-0 rounded-md border border-border-subtle px-2.5 py-1 text-[11px] text-muted-foreground transition-colors hover:border-border hover:text-foreground"
-            >
-              Redeem
-            </button>
-          ) : (
-            <button
-              type="button"
-              disabled
-              className="button-md shrink-0 rounded-md border border-border-subtle px-2.5 py-1 text-[11px] text-muted-foreground/50"
-            >
-              Redeem
-            </button>
-          )
+        {isResolved && resultLabel === "Won" ? (
+          <span className="shrink-0 rounded-full border border-yes/35 bg-yes/15 px-2 py-0.5 text-xs font-medium text-yes-foreground">
+            WON
+          </span>
+        ) : null}
+        {isResolved && resultLabel === "Lost" ? (
+          <span className="shrink-0 rounded-full border border-no/35 bg-no/15 px-2 py-0.5 text-xs font-medium text-no-foreground">
+            LOST
+          </span>
+        ) : null}
+        {isResolved && resultLabel === "Cashed out" ? (
+          <span className="shrink-0 rounded-full border border-border-subtle bg-surface-alt px-2 py-0.5 text-xs font-medium text-muted-foreground">
+            CASHED OUT
+          </span>
         ) : null}
       </div>
 
@@ -89,26 +94,34 @@ export function PositionCard({ position }: { position: Position }) {
         {question}
       </Link>
 
-      <div className="flex flex-wrap gap-x-6 gap-y-1 body-sm text-xs tabular-nums text-muted-foreground">
-        <span>
-          Avg price{" "}
-          <span className="title-md text-foreground">
-            {Math.round(position.avgPrice * 100)}¢
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 body-sm text-xs tabular-nums text-muted-foreground lg:flex-nowrap">
+        <span className={metricItemClass}>
+          Bet{" "}
+          <span className={metricValueClass}>
+            {formatUsd(position.costBasisUsd)}
           </span>
         </span>
-        <span>
-          Now{" "}
-          <span className="title-md text-foreground">
-            {currentPrice == null
-              ? "—"
-              : `${Math.round(currentPrice * 100)}¢`}
+        <span className={metricItemClass}>
+          Entry{" "}
+          <span className={metricValueClass}>
+            {Math.round(position.avgPrice * 100)}%
           </span>
         </span>
-        <span>
+        {!isResolved ? (
+          <span className={metricItemClass}>
+            Current probability{" "}
+            <span className={metricValueClass}>
+              {currentPrice == null
+                ? "—"
+                : `${Math.round(currentPrice * 100)}%`}
+            </span>
+          </span>
+        ) : null}
+        <span className={metricItemClass}>
           P&amp;L{" "}
           <span
             className={cn(
-              "title-md",
+              "text-xs font-medium",
               pnlUsd > 0 && "text-yes",
               pnlUsd < 0 && "text-no",
               pnlUsd === 0 && "text-foreground"
@@ -121,17 +134,24 @@ export function PositionCard({ position }: { position: Position }) {
             {pnlPct.toFixed(1)}%
           </span>
         </span>
-      </div>
-      <div className="flex flex-wrap gap-x-6 gap-y-1 body-sm text-[11px] tabular-nums text-muted-foreground/85">
-        <span>
-          Traded <span className="text-foreground/90">{formatUsd(position.costBasisUsd)}</span>
-        </span>
-        <span>
-          To win <span className="text-foreground/90">{formatUsd(toWinUsd)}</span>
-        </span>
-        <span>
-          Value <span className="text-foreground/90">{formatUsd(valueUsd)}</span>
-        </span>
+        {!isResolved ? (
+          <span className={metricItemClass}>
+            Payout <span className={metricValueClass}>{formatUsd(toWinUsd)}</span>
+          </span>
+        ) : null}
+        {isResolved && position.closedAt ? (
+          <span className={metricItemClass}>
+            Settled{" "}
+            <span className={metricValueClass}>
+              {new Date(position.closedAt).toLocaleString(undefined, {
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </span>
+          </span>
+        ) : null}
       </div>
     </div>
   )

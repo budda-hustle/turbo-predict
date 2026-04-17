@@ -1,25 +1,14 @@
 "use client"
 
 import * as React from "react"
-import Link from "next/link"
-import { ChevronDownIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
 import { formatUsd, formatUsdCompact } from "@/lib/markets"
 import type { ContractView, MarketViewModel } from "@/lib/market-view-model"
 import {
   useTrading,
-  type OrderExecutionType,
-  type OrderFlow,
   type OutcomeLeg,
   type PlaceOrderQuote,
 } from "@/lib/trading-context"
@@ -37,26 +26,10 @@ function parsePositiveNumber(raw: string): number {
 }
 
 function previewExecPrice(
-  marketPrice: number,
-  flow: OrderFlow,
-  orderType: OrderExecutionType,
-  limitPrice: number | undefined
+  marketPrice: number
 ): { ok: true; price: number } | { ok: false } {
   if (!Number.isFinite(marketPrice) || marketPrice <= 0 || marketPrice >= 1)
     return { ok: false }
-  if (orderType === "market") return { ok: true, price: marketPrice }
-  if (
-    limitPrice == null ||
-    !Number.isFinite(limitPrice) ||
-    limitPrice <= 0 ||
-    limitPrice >= 1
-  )
-    return { ok: false }
-  if (flow === "buy") {
-    if (marketPrice > limitPrice) return { ok: false }
-    return { ok: true, price: marketPrice }
-  }
-  if (marketPrice < limitPrice) return { ok: false }
   return { ok: true, price: marketPrice }
 }
 
@@ -71,18 +44,8 @@ function quoteOutcomeLabel(
   return `${base} · ${leg === "no" ? "No" : "Yes"}`
 }
 
-const flowBar =
-  "flex flex-1 gap-0.5 rounded-lg border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.02)_0%,rgba(0,0,0,0.2)_100%)] p-0.5"
-const controlHeight = "h-7"
-const dropdownControlHeight = "h-8"
 const controlRadius = "rounded-lg"
 const controlInnerRadius = "rounded-md"
-const flowBtn =
-  `button-md ${controlHeight} flex-1 ${controlInnerRadius} px-2 text-[10px] transition-colors`
-const flowInactive =
-  "border border-transparent bg-transparent text-muted-foreground/90 hover:bg-white/[0.02] hover:text-foreground/70"
-const flowActive =
-  "border border-[hsl(var(--primary)/0.22)] bg-[linear-gradient(180deg,rgba(255,215,0,0.08)_0%,rgba(255,215,0,0.04)_100%)] text-foreground"
 
 export function TradeTicket({
   market,
@@ -91,12 +54,6 @@ export function TradeTicket({
   onOutcomeLegChange,
   shares,
   onSharesChange,
-  flow,
-  onFlowChange,
-  orderType,
-  onOrderTypeChange,
-  limitPriceStr,
-  onLimitPriceStrChange,
   ui,
   onUiChange,
   onOrderFilled,
@@ -107,17 +64,11 @@ export function TradeTicket({
   onOutcomeLegChange: (v: OutcomeLeg) => void
   shares: string
   onSharesChange: (v: string) => void
-  flow: OrderFlow
-  onFlowChange: (v: OrderFlow) => void
-  orderType: OrderExecutionType
-  onOrderTypeChange: (v: OrderExecutionType) => void
-  limitPriceStr: string
-  onLimitPriceStrChange: (v: string) => void
   ui: UiStatus
   onUiChange: React.Dispatch<React.SetStateAction<UiStatus>>
   onOrderFilled?: () => void
 }) {
-  const { placeOrder, balanceUsd, getOpenPosition, openDeposit } = useTrading()
+  const { placeOrder, balanceUsd, openDeposit } = useTrading()
 
   const selectedContractIndex = React.useMemo(
     () =>
@@ -137,74 +88,49 @@ export function TradeTicket({
     outcomeLeg
   )
   const outcomePrices = market.contracts.map((c) => c.yesPrice)
-  const limitNum = parsePositiveNumber(limitPriceStr)
-  const limitPrice =
-    orderType === "limit" ? (limitNum > 0 && limitNum < 1 ? limitNum : undefined) : undefined
 
-  const px = previewExecPrice(marketPrice, flow, orderType, limitPrice)
-  const sharesNum = parsePositiveNumber(shares)
+  const px = previewExecPrice(marketPrice)
+  const betAmount = parsePositiveNumber(shares)
   const execPrice = px.ok ? px.price : 0
-  const estCost =
-    sharesNum > 0 && px.ok && Number.isFinite(execPrice) ? sharesNum * execPrice : 0
-  const maxPayout = sharesNum > 0 ? sharesNum : 0
-
-  const openPos = getOpenPosition(market.slug, selectedContractIndex, outcomeLeg)
-  const openPosShares = openPos?.shares ?? 0
-  const openPosCostBasis = openPos?.costBasisUsd ?? 0
-  const canSell = Boolean(openPos && openPosShares > 0 && !openPos?.closedAt)
-
-  const sellCostPortion =
-    flow === "sell" && openPosShares > 0 && Number.isFinite(openPosCostBasis)
-      ? (sharesNum / openPosShares) * openPosCostBasis
+  const estPayout =
+    betAmount > 0 && px.ok && Number.isFinite(execPrice)
+      ? betAmount / Math.max(execPrice, 1e-9)
       : 0
-  const youPay = flow === "buy" ? estCost : 0
-  const youWin = flow === "buy" ? maxPayout : estCost
-  const estProfit = flow === "buy" ? maxPayout - estCost : estCost - sellCostPortion
+  const estProfit = estPayout - betAmount
 
   const disabled =
     market.status !== "open" ||
     ui.kind === "loading" ||
-    sharesNum <= 0 ||
-    !px.ok ||
-    (flow === "sell" && (!canSell || sharesNum > openPosShares))
+    betAmount <= 0 ||
+    !px.ok
 
   const directionWord = outcomeLeg === "yes" ? "YES" : "NO"
-  const headingFull = `${flow === "buy" ? "Buying" : "Selling"} ${directionWord} — ${selectedContract.name}`
+  const headingFull = `${selectedContract.name} — ${directionWord}`
   const ctaSide = outcomeLeg === "yes" ? "YES" : "NO"
   const cents = Math.round(marketPrice * 100)
 
   async function onSubmit() {
     onUiChange({ kind: "idle" })
     if (market.status !== "open") return
-    if (sharesNum <= 0) {
-      onUiChange({ kind: "error", message: "Enter a positive share count." })
+    if (betAmount <= 0) {
+      onUiChange({ kind: "error", message: "Enter a positive bet amount." })
       return
     }
     if (!px.ok) {
       onUiChange({
         kind: "error",
-        message:
-          orderType === "limit"
-            ? flow === "buy"
-              ? "Limit below market — raise limit or use market order."
-              : "Limit above market — lower limit or use market order."
-            : "Invalid price.",
+        message: "Invalid probability.",
       })
       return
     }
-    if (flow === "buy" && estCost > balanceUsd) {
+    if (betAmount > balanceUsd) {
       onUiChange({
         kind: "error",
         message: "Insufficient balance. Deposit to continue.",
       })
       return
     }
-    if (flow === "sell") {
-      if (!openPos || sharesNum > openPosShares) {
-        onUiChange({ kind: "error", message: "Not enough shares to sell." })
-        return
-      }
-    }
+    const orderShares = betAmount / Math.max(execPrice, 1e-9)
 
     const quote: PlaceOrderQuote = {
       marketKey: market.slug,
@@ -214,10 +140,9 @@ export function TradeTicket({
       outcomeLabel,
       outcomeLeg,
       outcomePrices,
-      shares: sharesNum,
-      flow,
-      orderType,
-      limitPrice: orderType === "limit" ? limitPrice : undefined,
+      shares: orderShares,
+      flow: "buy",
+      orderType: "market",
     }
 
     onUiChange({ kind: "loading" })
@@ -234,18 +159,8 @@ export function TradeTicket({
         onUiChange({ kind: "error", message: "This market is closed." })
         return
       }
-      if (res.reason === "limit") {
-        onUiChange({
-          kind: "error",
-          message:
-            flow === "buy"
-              ? "Limit below market."
-              : "Limit above market.",
-        })
-        return
-      }
       if (res.reason === "no_position" || res.reason === "too_many_shares") {
-        onUiChange({ kind: "error", message: "Cannot sell that many shares." })
+        onUiChange({ kind: "error", message: "Unable to place bet." })
         return
       }
       onUiChange({ kind: "error", message: "Unable to place order." })
@@ -263,12 +178,8 @@ export function TradeTicket({
 
   const ctaLabel =
     ui.kind === "loading"
-      ? flow === "buy"
-        ? `Buying ${ctaSide}…`
-        : `Selling ${ctaSide}…`
-      : flow === "buy"
-        ? `Buy ${ctaSide}`
-        : `Sell ${ctaSide}`
+      ? `Buying ${ctaSide}…`
+      : `Buy ${ctaSide}`
 
   return (
     <div
@@ -292,7 +203,7 @@ export function TradeTicket({
             outcomeLeg === "yes" ? "text-yes-foreground" : "text-no-foreground"
           )}
         >
-          {cents}¢
+          {cents}%
         </p>
       </header>
 
@@ -335,7 +246,7 @@ export function TradeTicket({
 
       <div className="grid gap-2">
         <Label htmlFor="trade-shares">
-          Shares
+          Bet amount
         </Label>
         <Input
           id="trade-shares"
@@ -357,96 +268,6 @@ export function TradeTicket({
         </p>
       </div>
 
-      <div className="flex items-stretch gap-2">
-        <div className={cn(flowBar, "min-w-0 flex-[1.15]")}>
-          <button
-            type="button"
-            disabled={market.status !== "open"}
-            onClick={() => {
-              onFlowChange("buy")
-              onUiChange({ kind: "idle" })
-            }}
-            className={cn(
-              flowBtn,
-              flow === "buy" ? flowActive : flowInactive
-            )}
-          >
-            Buy
-          </button>
-          <button
-            type="button"
-            disabled={market.status !== "open" || !canSell}
-            onClick={() => {
-              onFlowChange("sell")
-              onUiChange({ kind: "idle" })
-            }}
-            className={cn(
-              flowBtn,
-              flow === "sell" ? flowActive : flowInactive
-            )}
-          >
-            Sell
-          </button>
-        </div>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            type="button"
-            disabled={market.status !== "open"}
-            className={cn(
-              `button-md inline-flex ${dropdownControlHeight} min-w-[5.8rem] shrink-0 items-center justify-center gap-1 border border-border px-3 text-[10px] leading-none text-muted-foreground transition-colors ${controlRadius} bg-surface-alt`,
-              "cursor-pointer bg-transparent hover:border-white/20 hover:text-foreground/90 disabled:cursor-default disabled:opacity-50"
-            )}
-          >
-            {orderType === "market" ? "Market" : "Limit"}
-            <ChevronDownIcon className="size-3 opacity-60" aria-hidden />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="min-w-[7rem]">
-            <DropdownMenuItem
-              className="button-md text-xs"
-              onClick={() => {
-                onOrderTypeChange("market")
-                onUiChange({ kind: "idle" })
-              }}
-            >
-              Market
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="button-md text-xs"
-              onClick={() => {
-                onOrderTypeChange("limit")
-                onUiChange({ kind: "idle" })
-              }}
-            >
-              Limit
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-
-      {orderType === "limit" && (
-        <div className="grid gap-2">
-          <Label
-            htmlFor="trade-limit"
-            className="field-label"
-          >
-            Limit price (0–1, e.g. 0.42)
-          </Label>
-          <Input
-            id="trade-limit"
-            inputMode="decimal"
-            value={limitPriceStr}
-            disabled={market.status !== "open"}
-            onChange={(e) => {
-              onLimitPriceStrChange(e.target.value)
-              onUiChange({ kind: "idle" })
-            }}
-            className="h-9 field-input text-sm tabular-nums"
-            placeholder="0.42"
-          />
-        </div>
-      )}
-
       <div className={cn("grid gap-1.5 border border-border-subtle bg-surface-alt px-3 py-2.5 tabular-nums", controlRadius)}>
         <div className="flex items-baseline justify-between gap-3">
           <span className="text-sm font-medium text-muted-foreground sm:text-[15px]">
@@ -460,19 +281,19 @@ export function TradeTicket({
               estProfit === 0 && "text-foreground"
             )}
           >
-            {sharesNum > 0 && px.ok ? `${estProfit > 0 ? "+" : ""}${formatUsd(estProfit)}` : "—"}
+            {betAmount > 0 && px.ok ? `${estProfit > 0 ? "+" : ""}${formatUsd(estProfit)}` : "—"}
           </span>
         </div>
         <div className="mt-1 flex justify-between gap-3 text-xs text-muted-foreground sm:text-[13px]">
-          <span>You pay</span>
+          <span>Bet</span>
           <span className="text-sm text-foreground sm:text-[15px]">
-            {sharesNum > 0 && px.ok ? formatUsd(youPay) : "—"}
+            {betAmount > 0 && px.ok ? formatUsd(betAmount) : "—"}
           </span>
         </div>
         <div className="flex justify-between gap-3 text-xs text-muted-foreground sm:text-[13px]">
-          <span>You win</span>
+          <span>Payout</span>
           <span className="text-sm text-foreground sm:text-[15px]">
-            {sharesNum > 0 && px.ok ? formatUsd(youWin) : "—"}
+            {betAmount > 0 && px.ok ? formatUsd(estPayout) : "—"}
           </span>
         </div>
       </div>
@@ -496,7 +317,7 @@ export function TradeTicket({
       )}
       {ui.kind === "success" && (
         <p className="body-sm text-sm text-yes" role="status">
-          Order filled — demo execution.
+          Bet placed — demo execution.
         </p>
       )}
 
@@ -512,42 +333,6 @@ export function TradeTicket({
       >
         {ctaLabel}
       </Button>
-
-      {openPos && !openPos.closedAt ? <Separator className="bg-border/60" /> : null}
-
-      {openPos && !openPos.closedAt ? (
-        <div className="grid gap-1.5 text-sm">
-          <span className="label-md text-muted-foreground">
-            Your position ({outcomeLabel})
-          </span>
-          <div className="flex flex-wrap gap-x-6 gap-y-1 body-sm text-xs tabular-nums text-muted-foreground sm:text-sm">
-            <span>
-              Avg{" "}
-              <span className="title-md text-foreground">
-                {Math.round(openPos.avgPrice * 100)}¢
-              </span>
-            </span>
-            <span>
-              Cost{" "}
-              <span className="title-md text-foreground">
-                {formatUsd(openPos.costBasisUsd)}
-              </span>
-            </span>
-            <span>
-              Shares{" "}
-              <span className="title-md text-foreground">
-                {openPos.shares.toFixed(2)}
-              </span>
-            </span>
-          </div>
-          <Link
-            href="/positions"
-            className="button-md text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-          >
-            View in Portfolio
-          </Link>
-        </div>
-      ) : null}
 
       {market.volumeUsd != null && (
         <p className="body-sm text-center text-[11px] text-muted-foreground">
