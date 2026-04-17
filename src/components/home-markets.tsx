@@ -183,7 +183,7 @@ function MarketCard({ market }: { market: MarketViewModel }) {
   return (
     <div
       className={cn(
-        "surface-card group flex flex-col gap-3 border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.02)_0%,rgba(0,0,0,0.22)_100%)] p-4 transition-colors duration-150",
+        "surface-card group flex h-full flex-col gap-3 border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.02)_0%,rgba(0,0,0,0.22)_100%)] p-4 transition-colors duration-150",
         "hover:border-border-strong"
       )}
     >
@@ -220,7 +220,7 @@ function MarketCard({ market }: { market: MarketViewModel }) {
         </div>
       </Link>
 
-      <div className="border-t border-border/50 pt-3">
+      <div className="mt-auto border-t border-border/50 pt-3">
         {isBinary ? (
           <BinaryOutcomeChips market={market} href={href} />
         ) : (
@@ -286,7 +286,7 @@ export function HomeMarkets({
     "button-md pressable inline-flex h-10 shrink-0 items-center justify-center rounded-lg border border-border-subtle bg-surface-alt px-3 text-xs text-muted-foreground transition-colors hover:border-border hover:bg-surface-hover hover:text-foreground sm:px-4 sm:text-sm"
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 pb-16 pt-6 sm:px-6 sm:pt-8">
+    <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 pb-16 pt-6 sm:px-6 sm:pt-8 lg:max-w-[1400px]">
       <header className="mx-auto max-w-2xl space-y-1 text-center">
         <h1 className="title-xl text-lg font-semibold tracking-[0.04em] text-foreground uppercase sm:text-xl">
           Predict outcomes. Trade instantly.
