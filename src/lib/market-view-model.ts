@@ -39,6 +39,9 @@ export type MarketViewModel = {
   rules?: string
   /** Optional supporting narrative on the market detail page */
   context?: string
+  recurringType?: import("@/lib/recurring").RecurringType
+  recurringSeriesKey?: string
+  recurringWindowLabel?: string
   /** Where this row was derived from (debug / future use) */
   source: "gamma-market" | "gamma-event"
 }

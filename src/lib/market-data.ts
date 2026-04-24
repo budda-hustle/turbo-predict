@@ -59,6 +59,9 @@ const MARKETS_SNAPSHOT: readonly MarketViewModel[] = MARKETS_SNAPSHOT_RAW.map(
       status: m.status,
       image: m.image,
       description: m.description,
+      recurringType: m.recurringType,
+      recurringSeriesKey: m.recurringSeriesKey,
+      recurringWindowLabel: m.recurringWindowLabel,
       source: m.source,
     }
   }
@@ -81,4 +84,11 @@ export function getSnapshotMarketBySlug(
   const key = decodeURIComponent(slug).trim()
   if (!key) return undefined
   return bySlug.get(key)
+}
+
+export function getSnapshotRecurringSeriesMarkets(
+  recurringSeriesKey: string
+): MarketViewModel[] {
+  if (!recurringSeriesKey.trim()) return []
+  return MARKETS_SNAPSHOT.filter((m) => m.recurringSeriesKey === recurringSeriesKey)
 }

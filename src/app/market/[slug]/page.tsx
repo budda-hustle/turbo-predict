@@ -1,7 +1,11 @@
 import { notFound } from "next/navigation"
 
+import { LegalFooter } from "@/components/legal-footer"
 import { MarketPageClient } from "@/components/market/market-page-client"
-import { getSnapshotMarketBySlug } from "@/lib/market-data"
+import {
+  getSnapshotMarketBySlug,
+  getSnapshotRecurringSeriesMarkets,
+} from "@/lib/market-data"
 import {
   sideToOutcomeIndex,
   type BinarySide,
@@ -62,11 +66,28 @@ export default async function MarketPage({ params, searchParams }: PageProps) {
   const initialOutcomeLeg: OutcomeLeg =
     market.marketType === "binary" && rawSide === "no" ? "no" : "yes"
 
+  const recurringTabs = market.recurringSeriesKey
+    ? getSnapshotRecurringSeriesMarkets(market.recurringSeriesKey)
+        .filter((m) => m.recurringType === market.recurringType)
+        .sort(
+          (a, b) =>
+            new Date(a.expiresAt).getTime() - new Date(b.expiresAt).getTime()
+        )
+        .map((m) => ({
+          slug: m.slug,
+          label: m.recurringWindowLabel ?? "Window",
+        }))
+    : []
+
   return (
-    <MarketPageClient
-      market={market}
-      initialContractId={initialContractId}
-      initialOutcomeLeg={initialOutcomeLeg}
-    />
+    <>
+      <MarketPageClient
+        market={market}
+        initialContractId={initialContractId}
+        initialOutcomeLeg={initialOutcomeLeg}
+        recurringTabs={recurringTabs}
+      />
+      <LegalFooter />
+    </>
   )
 }

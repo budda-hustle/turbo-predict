@@ -6,6 +6,11 @@ import { MarketActivityBlock } from "@/components/market/market-activity-block"
 import { MarketHero } from "@/components/market/market-hero"
 import { MarketMultiOutcomeHeroChart } from "@/components/market/market-multi-outcome-hero-chart"
 import { MarketPageLayout } from "@/components/market/market-page-layout"
+import {
+  MarketRecurringTabs,
+  type RecurringTabOption,
+} from "@/components/market/market-recurring-tabs"
+import { MarketTimelineBlock } from "@/components/market/market-timeline-block"
 import { OutcomeList } from "@/components/market/outcome-list"
 import { MarketContextRulesTabs } from "@/components/market/sections/market-context-rules-tabs"
 import { TradeTicket } from "@/components/market/trade-ticket/trade-ticket"
@@ -25,10 +30,12 @@ export function MarketPageClient({
   market,
   initialContractId,
   initialOutcomeLeg,
+  recurringTabs = [],
 }: {
   market: MarketViewModel
   initialContractId: string
   initialOutcomeLeg: OutcomeLeg
+  recurringTabs?: RecurringTabOption[]
 }) {
   const isLg = useMediaQuery("(min-width: 1024px)", false)
 
@@ -121,6 +128,7 @@ export function MarketPageClient({
   const main = (
     <>
       <MarketHero market={market} />
+      <MarketRecurringTabs activeSlug={market.slug} options={recurringTabs} />
       {market.marketType === "multi" ? (
         <MarketMultiOutcomeHeroChart market={market} />
       ) : null}
@@ -135,12 +143,18 @@ export function MarketPageClient({
         onTradeSide={tradeFromContractSide}
       />
       <MarketActivityBlock market={market} />
+      {!isLg ? <MarketTimelineBlock /> : null}
     </>
   )
 
   const sidebar = (
     <TradeTicketSidebar>
-      {isLg ? ticket : null}
+      {isLg ? (
+        <div className="space-y-4">
+          {ticket}
+          <MarketTimelineBlock />
+        </div>
+      ) : null}
     </TradeTicketSidebar>
   )
 

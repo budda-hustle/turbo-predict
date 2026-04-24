@@ -2,7 +2,9 @@
 
 import * as React from "react"
 import Link from "next/link"
+import { GemIcon, TrophyIcon } from "lucide-react"
 
+import { LegalFooter } from "@/components/legal-footer"
 import { PositionCard } from "@/components/position-card"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { formatUsd } from "@/lib/markets"
@@ -97,38 +99,30 @@ const segmentedTriggerClass =
   "flex-1 text-xs text-muted-foreground data-[state=active]:border data-[state=active]:border-[#d2a63a] data-[state=active]:text-[#f2bb2e] data-[state=active]:bg-[linear-gradient(180deg,rgba(255,215,100,0.18)_0%,rgba(255,200,60,0.12)_40%,rgba(180,120,0,0.18)_100%)]"
 
 export default function PositionsPage() {
-  const balanceUsd = 4_825
   const [tab, setTab] = React.useState<"active" | "settled">("active")
 
-  const allPnl = React.useMemo(
+  const activePredictionsValueUsd = React.useMemo(
     () =>
-      DEMO_POSITIONS.reduce((acc, p) => {
-        const currentPrice = p.closedAt ? null : p.markPrice
-        const pnl = p.closedAt
-          ? (p.settledPnlUsd ?? 0)
-          : currentPrice != null
-            ? p.shares * currentPrice - p.costBasisUsd
-            : 0
-        return acc + pnl
-      }, 0),
+      DEMO_POSITIONS.filter((p) => !p.closedAt).reduce(
+        (acc, p) => acc + p.costBasisUsd,
+        0
+      ),
     []
   )
-  const todayPnl = React.useMemo(() => allPnl * 0.28, [allPnl])
-  const activeBetsValueUsd = React.useMemo(
-    () => DEMO_POSITIONS.reduce((acc, p) => acc + p.costBasisUsd, 0),
-    []
-  )
-  const positionsValueUsd = React.useMemo(
+  const totalWonUsd = React.useMemo(
     () =>
-      DEMO_POSITIONS.reduce((acc, p) => {
-        if (p.closedAt) return acc + p.costBasisUsd + (p.settledPnlUsd ?? 0)
-        return acc + p.shares * p.markPrice
-      }, 0),
+      DEMO_POSITIONS.filter((p) => (p.settledPnlUsd ?? 0) > 0).reduce(
+        (acc, p) => acc + (p.settledPnlUsd ?? 0),
+        0
+      ),
     []
   )
-  const totalValueUsd = balanceUsd + positionsValueUsd
   const activeCount = React.useMemo(
     () => DEMO_POSITIONS.filter((p) => !p.closedAt).length,
+    []
+  )
+  const wonCount = React.useMemo(
+    () => DEMO_POSITIONS.filter((p) => (p.settledPnlUsd ?? 0) > 0).length,
     []
   )
   const settledCount = React.useMemo(
@@ -156,60 +150,56 @@ export default function PositionsPage() {
               ← Back
             </Link>
             <h1 className="heading-display-sm text-xl sm:text-2xl">
-              My Bets
+              My Predictions
             </h1>
           </div>
         </header>
 
-        <section className="surface-card space-y-4 p-4 sm:p-5">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-            <div className="space-y-2">
-              <p className="label-md text-[11px] text-muted-foreground">
-                Total value
-              </p>
-              <p className="heading-display-sm text-2xl text-foreground">
-                {formatUsd(totalValueUsd)}
-              </p>
-              <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs tabular-nums text-muted-foreground">
-                <span>
-                  Available balance{" "}
-                  <span className="title-md text-foreground">
-                    {formatUsd(balanceUsd)}
+        <section className="surface-card p-4 sm:p-5">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-2">
+            <div className="relative overflow-hidden rounded-xl border border-transparent bg-[linear-gradient(180deg,rgba(0,196,140,0.05)_0%,rgba(0,0,0,0.24)_100%),linear-gradient(135deg,rgba(0,196,140,0.22),rgba(0,196,140,0.06)_45%,rgba(255,255,255,0.06))] [background-clip:padding-box,border-box] px-3 py-2.5">
+              <div
+                className="pointer-events-none absolute -left-8 top-1/2 size-28 -translate-y-1/2 rounded-full bg-yes/25 blur-2xl"
+                aria-hidden
+              />
+              <div className="flex items-center gap-2.5">
+                <div className="inline-flex size-9 items-center justify-center rounded-full border border-yes/35 bg-yes/10 text-yes shadow-[0_0_18px_-6px_rgba(0,196,140,0.85)]">
+                  <GemIcon className="size-4.5" />
+                </div>
+                <div className="min-w-0">
+                  <p className="label-md text-[11px] uppercase tracking-[0.04em] text-muted-foreground">
+                    Active predictions
+                  </p>
+                  <p className="title-md mt-0.5 text-[27px] leading-none tabular-nums text-foreground">
+                    {formatUsd(activePredictionsValueUsd)}
+                  </p>
+                  <span className="mt-1 inline-flex items-center rounded-md bg-yes/10 px-2 py-0.5 text-xs font-medium text-yes">
+                    • {activeCount} predictions
                   </span>
-                </span>
-                <span>
-                  Active bets{" "}
-                  <span className="title-md text-foreground">
-                    {formatUsd(activeBetsValueUsd)}
-                  </span>
-                </span>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-2">
-            <div className="rounded-lg border border-border/60 bg-surface-alt/60 p-3">
-              <p className="label-md text-[11px] text-muted-foreground">Today P&amp;L</p>
-              <p
-                className={
-                  "title-md mt-1 text-sm tabular-nums " +
-                  (todayPnl > 0 ? "text-yes" : todayPnl < 0 ? "text-no" : "text-foreground")
-                }
-              >
-                {todayPnl > 0 ? "+" : ""}
-                {formatUsd(todayPnl)}
-              </p>
-            </div>
-            <div className="rounded-lg border border-border/60 bg-surface-alt/60 p-3">
-              <p className="label-md text-[11px] text-muted-foreground">Total P&amp;L</p>
-              <p
-                className={
-                  "title-md mt-1 text-sm tabular-nums " +
-                  (allPnl > 0 ? "text-yes" : allPnl < 0 ? "text-no" : "text-foreground")
-                }
-              >
-                {allPnl > 0 ? "+" : ""}
-                {formatUsd(allPnl)}
-              </p>
+            <div className="relative overflow-hidden rounded-xl border border-transparent bg-[linear-gradient(180deg,rgba(255,192,64,0.06)_0%,rgba(0,0,0,0.24)_100%),linear-gradient(135deg,rgba(255,192,64,0.24),rgba(255,192,64,0.08)_45%,rgba(255,255,255,0.06))] [background-clip:padding-box,border-box] px-3 py-2.5">
+              <div
+                className="pointer-events-none absolute -left-8 top-1/2 size-28 -translate-y-1/2 rounded-full bg-amber-300/20 blur-2xl"
+                aria-hidden
+              />
+              <div className="flex items-center gap-2.5">
+                <div className="inline-flex size-9 items-center justify-center rounded-full border border-amber-300/40 bg-amber-300/10 text-amber-200 shadow-[0_0_18px_-6px_rgba(255,192,64,0.85)]">
+                  <TrophyIcon className="size-4.5" />
+                </div>
+                <div className="min-w-0">
+                  <p className="label-md text-[11px] uppercase tracking-[0.04em] text-muted-foreground">
+                    Total won
+                  </p>
+                  <p className="title-md mt-0.5 text-[27px] leading-none tabular-nums text-foreground">
+                    {formatUsd(totalWonUsd)}
+                  </p>
+                  <span className="mt-1 inline-flex items-center rounded-md bg-amber-300/10 px-2 py-0.5 text-xs font-medium text-amber-200">
+                    • {wonCount} won
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -224,7 +214,7 @@ export default function PositionsPage() {
               Active ({activeCount})
             </TabsTrigger>
             <TabsTrigger value="settled" className={segmentedTriggerClass}>
-              Settled ({settledCount})
+              Resolved ({settledCount})
             </TabsTrigger>
           </TabsList>
         </Tabs>
@@ -242,6 +232,7 @@ export default function PositionsPage() {
           })}
         </div>
       </div>
+      <LegalFooter />
     </div>
   )
 }

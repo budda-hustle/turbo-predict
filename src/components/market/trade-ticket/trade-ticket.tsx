@@ -262,7 +262,7 @@ export function TradeTicket({
 
       <div className="grid gap-2">
         <Label htmlFor="trade-shares">
-          Bet amount
+          Amount to invest
         </Label>
         <Input
           id="trade-shares"
@@ -301,13 +301,13 @@ export function TradeTicket({
           </span>
         </div>
         <div className="mt-1 flex justify-between gap-3 text-xs text-muted-foreground sm:text-[13px]">
-          <span>Bet</span>
+          <span>Amount to invest</span>
           <span className="text-sm text-foreground sm:text-[15px]">
             {betAmount > 0 && px.ok ? formatUsd(betAmount) : "—"}
           </span>
         </div>
         <div className="flex justify-between gap-3 text-xs text-muted-foreground sm:text-[13px]">
-          <span>Payout</span>
+          <span>Possible Win</span>
           <span className="text-sm text-foreground sm:text-[15px]">
             {betAmount > 0 && px.ok ? formatUsd(estPayout) : "—"}
           </span>

@@ -5,6 +5,7 @@ import { ChevronRightIcon } from "lucide-react"
 
 import { ContractPriceChart } from "@/components/market/contract-price-chart"
 import type { MarketViewModel } from "@/lib/market-view-model"
+import { formatDecimalOdds } from "@/lib/odds"
 import type { OutcomeLeg } from "@/lib/trading-context"
 import { cn } from "@/lib/utils"
 
@@ -70,8 +71,8 @@ export function OutcomeList({
           const noSelected = active && selectedLeg === "no"
           const expanded = expandedContractId === c.id
           const pct = Math.round(c.yesPrice * 100)
-          const yesCents = Math.round(c.yesPrice * 100)
-          const noCents = Math.round(c.noPrice * 100)
+          const yesOdds = formatDecimalOdds(c.yesPrice)
+          const noOdds = formatDecimalOdds(c.noPrice)
           const delta = demoDeltaPercent(market.slug, i)
           const dStr = deltaStr(delta)
 
@@ -189,7 +190,7 @@ export function OutcomeList({
                       <span className={cn(yesSelected ? "text-yes-foreground" : "text-muted-foreground")}>
                         YES
                       </span>
-                      <span className="title-md text-yes-foreground">{yesCents}%</span>
+                      <span className="title-md text-yes-foreground">{yesOdds}</span>
                     </button>
                     <button
                       type="button"
@@ -211,7 +212,7 @@ export function OutcomeList({
                       <span className={cn(noSelected ? "text-no-foreground" : "text-muted-foreground")}>
                         NO
                       </span>
-                      <span className="title-md text-no-foreground">{noCents}%</span>
+                      <span className="title-md text-no-foreground">{noOdds}</span>
                     </button>
                   </div>
                 </div>
@@ -300,7 +301,7 @@ export function OutcomeList({
                       <span className={cn(yesSelected ? "text-yes-foreground" : "text-muted-foreground")}>
                         YES
                       </span>
-                      <span className="title-md text-yes-foreground">{yesCents}%</span>
+                      <span className="title-md text-yes-foreground">{yesOdds}</span>
                     </button>
                     <button
                       type="button"
@@ -322,7 +323,7 @@ export function OutcomeList({
                       <span className={cn(noSelected ? "text-no-foreground" : "text-muted-foreground")}>
                         NO
                       </span>
-                      <span className="title-md text-no-foreground">{noCents}%</span>
+                      <span className="title-md text-no-foreground">{noOdds}</span>
                     </button>
                   </div>
                 </div>

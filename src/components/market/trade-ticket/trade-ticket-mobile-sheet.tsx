@@ -11,12 +11,10 @@ import { cn } from "@/lib/utils"
 export function TradeTicketMobileSheet({
   open,
   onOpenChange,
-  title = "Trade",
   children,
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
-  title?: string
   children: React.ReactNode
 }) {
   return (
@@ -24,14 +22,13 @@ export function TradeTicketMobileSheet({
       <DialogContent
         showCloseButton={false}
         className={cn(
-          "fixed top-auto bottom-0 left-2 right-2 z-50 max-h-[min(90dvh,720px)] w-auto max-w-none",
-          "translate-x-0 translate-y-0 overflow-y-visible rounded-t-xl rounded-b-none border-0 bg-transparent p-0 shadow-none",
-          "sm:left-4 sm:right-4",
+          "fixed inset-x-0 top-auto bottom-0 z-50 max-h-[min(90dvh,720px)] w-full max-w-none sm:max-w-none",
+          "translate-x-0 translate-y-0 overflow-y-visible rounded-none border-0 bg-transparent p-0 shadow-none sm:rounded-none",
           "data-open:animate-in data-open:fade-in-0 data-open:slide-in-from-bottom-4",
           "data-closed:animate-out data-closed:fade-out-0 data-closed:slide-out-to-bottom-4 duration-200"
         )}
       >
-        <div className="pb-4">{children}</div>
+        <div className="w-full px-0 pb-4 [&>*]:w-full">{children}</div>
       </DialogContent>
     </Dialog>
   )
