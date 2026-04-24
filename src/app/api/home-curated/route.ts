@@ -18,6 +18,8 @@ type GammaEvent = {
   }>
 }
 
+type GammaMarket = NonNullable<GammaEvent["markets"]>[number]
+
 function parseJsonArray(raw: string | undefined): unknown[] {
   if (!raw) return []
   try {
@@ -28,7 +30,7 @@ function parseJsonArray(raw: string | undefined): unknown[] {
   }
 }
 
-function toCuratedItem(m: GammaEvent["markets"][number]): CuratedMarketItem | null {
+function toCuratedItem(m: GammaMarket): CuratedMarketItem | null {
   const slug = m.slug?.trim()
   const question = m.question?.trim()
   if (!slug || !question) return null
