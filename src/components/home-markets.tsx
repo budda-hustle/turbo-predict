@@ -686,6 +686,7 @@ export function HomeMarkets({
     if (!row || !pred || !filter) return
 
     function measure() {
+      if (!row || !pred || !filter) return
       setControlsWidth(row.clientWidth)
       setMyPredWidth(pred.clientWidth)
       setTimeFilterWidth(filter.clientWidth)
