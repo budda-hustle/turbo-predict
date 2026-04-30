@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { usePathname, useRouter } from "next/navigation"
 
 import { MarketActivityBlock } from "@/components/market/market-activity-block"
 import { MarketHero } from "@/components/market/market-hero"
@@ -31,13 +32,17 @@ export function MarketPageClient({
   initialContractId,
   initialOutcomeLeg,
   recurringTabs = [],
+  initialOpenBetSlip = false,
 }: {
   market: MarketViewModel
   initialContractId: string
   initialOutcomeLeg: OutcomeLeg
   recurringTabs?: RecurringTabOption[]
+  initialOpenBetSlip?: boolean
 }) {
   const isLg = useMediaQuery("(min-width: 1024px)", false)
+  const router = useRouter()
+  const pathname = usePathname()
 
   const [selectedContractId, setSelectedContractId] = React.useState(() => {
     if (
@@ -85,6 +90,14 @@ export function MarketPageClient({
       setExpandedContractId(null)
     }
   }, [market.contracts, expandedContractId])
+
+  const hasAutoOpenedRef = React.useRef(false)
+  React.useEffect(() => {
+    if (isLg || !initialOpenBetSlip || hasAutoOpenedRef.current) return
+    hasAutoOpenedRef.current = true
+    setSheetOpen(true)
+    router.replace(pathname, { scroll: false })
+  }, [initialOpenBetSlip, isLg, pathname, router])
 
   const selectedContract = React.useMemo(
     () =>

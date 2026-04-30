@@ -2,15 +2,26 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { GemIcon, TrophyIcon } from "lucide-react"
+import { GemIcon, ShieldCheckIcon, TrophyIcon } from "lucide-react"
 
 import { LegalFooter } from "@/components/legal-footer"
 import { PositionCard } from "@/components/position-card"
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { formatUsd } from "@/lib/markets"
 import type { Position } from "@/lib/trading-context"
 
-const DEMO_POSITIONS: readonly Position[] = [
+type DemoPosition = Position & { cashoutAmount?: number }
+
+const INITIAL_DEMO_POSITIONS: readonly DemoPosition[] = [
   {
     id: "demo-active-1",
     marketId: "democratic-presidential-nominee-2028",
@@ -23,6 +34,7 @@ const DEMO_POSITIONS: readonly Position[] = [
     openedAt: "2026-04-10T13:40:00.000Z",
     question: "Democratic Presidential Nominee 2028",
     markPrice: 0.36,
+    cashoutAmount: 740,
   },
   {
     id: "demo-active-2",
@@ -36,6 +48,7 @@ const DEMO_POSITIONS: readonly Position[] = [
     openedAt: "2026-04-11T09:20:00.000Z",
     question: "Republican Presidential Nominee 2028",
     markPrice: 0.26,
+    cashoutAmount: 1020,
   },
   {
     id: "demo-closed-1",
@@ -100,43 +113,92 @@ const segmentedTriggerClass =
 
 export default function PositionsPage() {
   const [tab, setTab] = React.useState<"active" | "settled">("active")
+  const [positions, setPositions] = React.useState<DemoPosition[]>([
+    ...INITIAL_DEMO_POSITIONS,
+  ])
+  const [settledMetaById, setSettledMetaById] = React.useState(DEMO_SETTLED_META)
+  const [cashoutTargetId, setCashoutTargetId] = React.useState<string | null>(null)
+  const [toast, setToast] = React.useState<{
+    title: string
+    description: string
+  } | null>(null)
 
   const activePredictionsValueUsd = React.useMemo(
     () =>
-      DEMO_POSITIONS.filter((p) => !p.closedAt).reduce(
+      positions.filter((p) => !p.closedAt).reduce(
         (acc, p) => acc + p.costBasisUsd,
         0
       ),
-    []
+    [positions]
   )
   const totalWonUsd = React.useMemo(
     () =>
-      DEMO_POSITIONS.filter((p) => (p.settledPnlUsd ?? 0) > 0).reduce(
-        (acc, p) => acc + (p.settledPnlUsd ?? 0),
-        0
-      ),
-    []
+      positions
+        .filter((p) => Boolean(p.closedAt))
+        .filter((p) => settledMetaById[p.id]?.result === "Won")
+        .reduce((acc, p) => acc + (p.settledPnlUsd ?? 0), 0),
+    [positions, settledMetaById]
   )
   const activeCount = React.useMemo(
-    () => DEMO_POSITIONS.filter((p) => !p.closedAt).length,
-    []
+    () => positions.filter((p) => !p.closedAt).length,
+    [positions]
   )
   const wonCount = React.useMemo(
-    () => DEMO_POSITIONS.filter((p) => (p.settledPnlUsd ?? 0) > 0).length,
-    []
+    () =>
+      positions
+        .filter((p) => Boolean(p.closedAt))
+        .filter((p) => settledMetaById[p.id]?.result === "Won").length,
+    [positions, settledMetaById]
   )
   const settledCount = React.useMemo(
-    () => DEMO_POSITIONS.filter((p) => Boolean(p.closedAt)).length,
-    []
+    () => positions.filter((p) => Boolean(p.closedAt)).length,
+    [positions]
   )
 
   const list = React.useMemo(
     () =>
-      DEMO_POSITIONS.filter((p) =>
+      positions.filter((p) =>
         tab === "settled" ? Boolean(p.closedAt) : !p.closedAt
       ),
-    [tab]
+    [tab, positions]
   )
+  const cashoutTarget = React.useMemo(
+    () => positions.find((p) => p.id === cashoutTargetId) ?? null,
+    [positions, cashoutTargetId]
+  )
+  const cashoutAmount = cashoutTarget?.cashoutAmount ?? 0
+
+  React.useEffect(() => {
+    if (!toast) return
+    const t = window.setTimeout(() => setToast(null), 2600)
+    return () => window.clearTimeout(t)
+  }, [toast])
+
+  function confirmCashout() {
+    if (!cashoutTarget) return
+    const amount = cashoutTarget.cashoutAmount ?? 0
+    setPositions((prev) =>
+      prev.map((p) => {
+        if (p.id !== cashoutTarget.id) return p
+        return {
+          ...p,
+          shares: 0,
+          closedAt: new Date().toISOString(),
+          settledPnlUsd: amount - p.costBasisUsd,
+          cashoutAmount: undefined,
+        }
+      })
+    )
+    setSettledMetaById((prev) => ({
+      ...prev,
+      [cashoutTarget.id]: { result: "Cashed out", claimed: true },
+    }))
+    setCashoutTargetId(null)
+    setToast({
+      title: "Cashout successful",
+      description: `${formatUsd(amount)} has been added to your balance.`,
+    })
+  }
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
@@ -221,18 +283,68 @@ export default function PositionsPage() {
 
         <div className="flex flex-col gap-3">
           {list.map((p) => {
-            const settledMeta = p.closedAt ? DEMO_SETTLED_META[p.id] : undefined
+            const settledMeta = p.closedAt ? settledMetaById[p.id] : undefined
             return (
               <PositionCard
                 key={p.id}
                 position={p}
                 settledResult={settledMeta?.result}
+                cashoutAmount={!p.closedAt ? p.cashoutAmount : undefined}
+                onCashout={
+                  !p.closedAt && p.cashoutAmount != null
+                    ? () => setCashoutTargetId(p.id)
+                    : undefined
+                }
               />
             )
           })}
         </div>
       </div>
       <LegalFooter />
+      <Dialog
+        open={cashoutTarget != null}
+        onOpenChange={(open) => !open && setCashoutTargetId(null)}
+      >
+        <DialogContent className="max-w-md border border-white/12 bg-[radial-gradient(120%_120%_at_0%_0%,rgba(255,215,0,0.05)_0%,rgba(255,255,255,0.01)_42%,rgba(0,0,0,0.4)_100%)] shadow-[0_20px_60px_-40px_rgba(0,0,0,0.95)] [background-clip:padding-box]">
+          <DialogHeader>
+            <DialogTitle className="inline-flex items-center gap-2 text-lg font-semibold tracking-[0.02em] text-foreground">
+              <ShieldCheckIcon className="size-4 text-primary/65" />
+              Cash out prediction?
+            </DialogTitle>
+          </DialogHeader>
+          <div className="mx-auto my-1 w-full max-w-xs rounded-xl border border-[#c89b2c]/40 bg-[linear-gradient(180deg,rgba(243,213,105,0.12)_0%,rgba(223,182,47,0.07)_52%,rgba(184,134,6,0.12)_100%)] px-4 py-3 text-center">
+            <p className="text-[11px] uppercase tracking-[0.05em] text-muted-foreground">
+              You receive now
+            </p>
+            <p className="mt-1 text-4xl leading-none font-semibold tabular-nums text-[#f3d569]">
+              {formatUsd(cashoutAmount)}
+            </p>
+          </div>
+          <DialogDescription className="mx-auto max-w-[34ch] text-center text-sm leading-relaxed text-muted-foreground">
+            This will close your position. You won&apos;t receive the full payout
+            if the prediction resolves in your favor.
+          </DialogDescription>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCashoutTargetId(null)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={confirmCashout}
+              className="h-10 min-w-[11rem] border border-[#c89b2c] bg-[linear-gradient(180deg,#f3d569_0%,#dfb62f_52%,#b88606_100%)] text-sm font-semibold text-[#1f1500] shadow-[0_8px_24px_-14px_rgba(223,182,47,0.85)] transition-all hover:brightness-105 hover:shadow-[0_10px_28px_-14px_rgba(223,182,47,0.95)]"
+            >
+              Cash out {formatUsd(cashoutAmount)}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      {toast ? (
+        <div className="fixed right-4 bottom-4 z-[100] w-[min(92vw,360px)] rounded-xl border border-border-subtle bg-surface-alt p-3 shadow-lg">
+          <p className="text-sm font-medium text-foreground">{toast.title}</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            {toast.description}
+          </p>
+        </div>
+      ) : null}
     </div>
   )
 }

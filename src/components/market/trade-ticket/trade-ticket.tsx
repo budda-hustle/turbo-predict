@@ -1,13 +1,14 @@
 "use client"
 
 import * as React from "react"
-import { XIcon } from "lucide-react"
+import { CircleHelpIcon, XIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { formatUsd, formatUsdCompact } from "@/lib/markets"
+import { formatUsd } from "@/lib/markets"
 import type { ContractView, MarketViewModel } from "@/lib/market-view-model"
+import { formatDecimalOdds } from "@/lib/odds"
 import {
   useTrading,
   type OutcomeLeg,
@@ -110,7 +111,7 @@ export function TradeTicket({
   const directionWord = outcomeLeg === "yes" ? "YES" : "NO"
   const headingFull = `${selectedContract.name} — ${directionWord}`
   const ctaSide = outcomeLeg === "yes" ? "YES" : "NO"
-  const cents = Math.round(marketPrice * 100)
+  const priceOdds = formatDecimalOdds(marketPrice)
 
   async function onSubmit() {
     onUiChange({ kind: "idle" })
@@ -215,11 +216,19 @@ export function TradeTicket({
         </h2>
         <p
           className={cn(
-            "title-md text-sm tabular-nums",
+            "title-md inline-flex items-center gap-1.5 text-sm tabular-nums",
             outcomeLeg === "yes" ? "text-yes-foreground" : "text-no-foreground"
           )}
         >
-          {cents}%
+          <span className="text-muted-foreground">Price</span>
+          <span className="text-foreground">{priceOdds}</span>
+          <span
+            className="inline-flex items-center text-muted-foreground/60"
+            title={"Price\nPrice represents the odds for this outcome."}
+            aria-label="Price tooltip: Price represents the odds for this outcome."
+          >
+            <CircleHelpIcon className="size-3.5" />
+          </span>
         </p>
       </header>
 
@@ -307,7 +316,7 @@ export function TradeTicket({
           </span>
         </div>
         <div className="flex justify-between gap-3 text-xs text-muted-foreground sm:text-[13px]">
-          <span>Possible Win</span>
+          <span>Possible Payout</span>
           <span className="text-sm text-foreground sm:text-[15px]">
             {betAmount > 0 && px.ok ? formatUsd(estPayout) : "—"}
           </span>
@@ -350,11 +359,6 @@ export function TradeTicket({
         {ctaLabel}
       </Button>
 
-      {market.volumeUsd != null && (
-        <p className="body-sm text-center text-[11px] text-muted-foreground">
-          Vol. {formatUsdCompact(market.volumeUsd)} · Snapshot · session demo
-        </p>
-      )}
     </div>
   )
 }

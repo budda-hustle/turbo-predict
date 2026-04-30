@@ -14,9 +14,13 @@ type SettledResult = "Won" | "Lost" | "Cashed out"
 export function PositionCard({
   position,
   settledResult,
+  cashoutAmount,
+  onCashout,
 }: {
   position: Position
   settledResult?: SettledResult
+  cashoutAmount?: number
+  onCashout?: () => void
 }) {
   const [copied, setCopied] = React.useState(false)
   const question = position.question || "Market"
@@ -56,6 +60,7 @@ export function PositionCard({
         })
       : null
   const priceOdds = formatDecimalOdds(position.avgPrice)
+  const canCashout = !isResolved && cashoutAmount != null && onCashout != null
 
   async function copyPredictionId() {
     try {
@@ -110,6 +115,18 @@ export function PositionCard({
           )}
         </div>
         <div className="flex items-center gap-2">
+          {canCashout ? (
+            <button
+              type="button"
+              onClick={onCashout}
+              className={cn(
+                "inline-flex h-8 items-center justify-center rounded-full border border-[#c89b2c] bg-[linear-gradient(180deg,#f3d569_0%,#dfb62f_52%,#b88606_100%)] px-3 text-xs font-semibold text-[#1f1500] transition-all",
+                "shadow-[0_6px_16px_-10px_rgba(223,182,47,0.85)] hover:brightness-105"
+              )}
+            >
+              Cashout {formatUsd(cashoutAmount)}
+            </button>
+          ) : null}
           {isResolved && resultLabel === "Won" ? (
             <span className="shrink-0 rounded-full border border-yes/35 bg-yes/15 px-2 py-0.5 text-xs font-medium text-yes-foreground">
               WON
@@ -160,8 +177,8 @@ export function PositionCard({
             </>
           ) : null}
         </div>
-        <div className="ml-auto shrink-0 text-right tabular-nums">
-          <p className="text-[11px] font-medium text-muted-foreground">Possible win:</p>
+        <div className="ml-auto w-full shrink-0 text-right tabular-nums sm:w-auto">
+          <p className="text-[11px] font-medium text-muted-foreground">Possible payout:</p>
           <p className="text-base font-semibold text-yes sm:text-lg">
             {formatUsd(toWinUsd)}
           </p>

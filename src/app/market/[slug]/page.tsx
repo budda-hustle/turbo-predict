@@ -16,20 +16,31 @@ type PageProps = {
   params: Promise<{ slug: string }>
   searchParams: Promise<{
     side?: string | string[]
+    bet?: string | string[]
     outcome?: string | string[]
+    outcomeId?: string | string[]
+    openBetSlip?: string | string[]
   }>
 }
 
 function parseInitialContractIndex(
   market: { contracts: { length: number } },
-  sp: { side?: string | string[]; outcome?: string | string[] }
+  sp: {
+    side?: string | string[]
+    bet?: string | string[]
+    outcome?: string | string[]
+    outcomeId?: string | string[]
+  }
 ): number {
   if (market.contracts.length <= 1) return 0
 
   const rawOutcome =
     typeof sp.outcome === "string" ? sp.outcome.trim() : ""
-  if (rawOutcome !== "") {
-    const n = parseInt(rawOutcome, 10)
+  const rawOutcomeId =
+    typeof sp.outcomeId === "string" ? sp.outcomeId.trim() : ""
+  const candidateOutcome = rawOutcome !== "" ? rawOutcome : rawOutcomeId
+  if (candidateOutcome !== "") {
+    const n = parseInt(candidateOutcome, 10)
     if (
       Number.isFinite(n) &&
       n >= 0 &&
@@ -37,7 +48,13 @@ function parseInitialContractIndex(
     )
       return n
   }
-  const rawSide = typeof sp.side === "string" ? sp.side.toLowerCase() : ""
+  const rawSideCandidate =
+    typeof sp.side === "string"
+      ? sp.side.toLowerCase()
+      : typeof sp.bet === "string"
+        ? sp.bet.toLowerCase()
+        : ""
+  const rawSide = rawSideCandidate
   const side: BinarySide | undefined =
     rawSide === "yes" ? "yes" : rawSide === "no" ? "no" : undefined
   const fromSide = sideToOutcomeIndex(side)
@@ -63,8 +80,16 @@ export default async function MarketPage({ params, searchParams }: PageProps) {
     ""
 
   const rawSide = typeof sp.side === "string" ? sp.side.toLowerCase() : ""
+  const rawBet = typeof sp.bet === "string" ? sp.bet.toLowerCase() : ""
+  const sideRaw = rawSide || rawBet
   const initialOutcomeLeg: OutcomeLeg =
-    market.marketType === "binary" && rawSide === "no" ? "no" : "yes"
+    market.marketType === "binary" && sideRaw === "no" ? "no" : "yes"
+  const openBetSlipRaw =
+    typeof sp.openBetSlip === "string" ? sp.openBetSlip.toLowerCase() : ""
+  const initialOpenBetSlip =
+    openBetSlipRaw === "1" ||
+    openBetSlipRaw === "true" ||
+    openBetSlipRaw === "yes"
 
   const recurringTabs = market.recurringSeriesKey
     ? getSnapshotRecurringSeriesMarkets(market.recurringSeriesKey)
@@ -86,6 +111,7 @@ export default async function MarketPage({ params, searchParams }: PageProps) {
         initialContractId={initialContractId}
         initialOutcomeLeg={initialOutcomeLeg}
         recurringTabs={recurringTabs}
+      initialOpenBetSlip={initialOpenBetSlip}
       />
       <LegalFooter />
     </>

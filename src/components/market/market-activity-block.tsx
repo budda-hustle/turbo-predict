@@ -2,7 +2,6 @@
 
 import * as React from "react"
 
-import { formatUsdCompact } from "@/lib/markets"
 import type { MarketViewModel } from "@/lib/market-view-model"
 import { useTrading } from "@/lib/trading-context"
 import { cn } from "@/lib/utils"
@@ -190,9 +189,6 @@ export function MarketActivityBlock({ market }: { market: MarketViewModel }) {
             </li>
           ))}
         </ul>
-        <p className="field-helper mt-3 border-t border-activity-border pt-2 text-center text-[10px] text-activity-muted">
-          Session tape · Vol. {formatUsdCompact(market.volumeUsd)}
-        </p>
       </div>
     </section>
   )
